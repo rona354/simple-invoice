@@ -54,6 +54,7 @@ export {
   InvoiceCard,
   InvoiceList,
   InvoiceForm,
+  InvoiceDisplay,
 } from './components'
 
-export { InvoicePdf, PdfDownload } from './pdf'
+export { renderInvoiceToBuffer, PdfDownload } from './pdf'

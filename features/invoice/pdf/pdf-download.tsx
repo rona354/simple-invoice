@@ -2,48 +2,85 @@
 
 import { useState } from 'react'
 import { Button } from '@/shared/components/ui'
-import {
-  renderPdfToBlob,
-  downloadPdfBlob,
-  generateInvoiceFilename,
-} from '@/shared/lib/pdf'
-import { InvoicePdf } from './invoice-pdf'
-import type { InvoiceWithProfile } from '../types'
 
 interface PdfDownloadProps {
-  invoice: InvoiceWithProfile
+  invoiceId?: string
+  publicId?: string
   variant?: 'default' | 'outline' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
 }
 
 export function PdfDownload({
-  invoice,
+  invoiceId,
+  publicId,
   variant = 'default',
   size = 'md',
 }: PdfDownloadProps) {
   const [isGenerating, setIsGenerating] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleDownload() {
+    if (!publicId && !invoiceId) {
+      setError('Missing invoice ID')
+      return
+    }
+
     setIsGenerating(true)
+    setError(null)
+
     try {
-      const blob = await renderPdfToBlob(<InvoicePdf invoice={invoice} />)
-      const filename = generateInvoiceFilename(invoice.invoice_number)
-      downloadPdfBlob(blob, filename)
-    } catch (error) {
-      console.error('Failed to generate PDF:', error)
+      const endpoint = publicId
+        ? `/api/public/invoices/${publicId}/pdf`
+        : `/api/invoices/${invoiceId}/pdf`
+      const response = await fetch(endpoint)
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to generate PDF')
+      }
+
+      const blob = await response.blob()
+      const contentDisposition = response.headers.get('Content-Disposition')
+      const filename = contentDisposition?.match(/filename="(.+)"/)?.[1] ?? 'invoice.pdf'
+
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Download failed'
+      setError(message)
     } finally {
       setIsGenerating(false)
     }
   }
 
+  const buttonText = isGenerating
+    ? 'Generating...'
+    : error
+      ? 'Retry Download'
+      : 'Download PDF'
+
   return (
-    <Button
-      onClick={handleDownload}
-      disabled={isGenerating}
-      variant={variant}
-      size={size}
-    >
-      {isGenerating ? 'Generating...' : 'Download PDF'}
-    </Button>
+    <div className="inline-flex flex-col items-start gap-1">
+      <Button
+        onClick={handleDownload}
+        disabled={isGenerating}
+        variant={error ? 'outline' : variant}
+        size={size}
+        aria-busy={isGenerating}
+      >
+        {buttonText}
+      </Button>
+      {error && (
+        <span className="text-xs text-red-600" role="alert">
+          {error}
+        </span>
+      )}
+    </div>
   )
 }

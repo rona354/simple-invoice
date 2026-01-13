@@ -19,9 +19,9 @@ Key files:
 - PROGRESS.md → This file (current status)
 - PLAN.md → Original feature plan (historical)
 
-Current phase: Production Ready (Cleaned)
-Last completed: Session 11 - Codebase cleanup, dead code removal, DRY consolidation
-Next task: Deploy to Vercel
+Current phase: Production Ready
+Last completed: Session 14 - Invoice UI/UX redesign (Modern Minimal)
+Next task: Test in browser, deploy to Vercel
 
 GitHub: https://github.com/rona354/simple-invoice
 
@@ -40,7 +40,7 @@ Architecture: Pragmatic Clean Architecture
 | **Current Phase** | Production Ready |
 | **Phase Progress** | 100% |
 | **Overall Progress** | 100% (Build ✅, Tests ✅, Git ✅, Vercel ready) |
-| **Last Updated** | 2026-01-13 |
+| **Last Updated** | 2026-01-14 |
 | **Tests** | 150 passing |
 | **GitHub** | https://github.com/rona354/simple-invoice |
 | **Blockers** | None |
@@ -867,6 +867,160 @@ README.md                                       ✅ Complete rewrite
 - Tests passing: 150/150 ✅
 - Codebase significantly cleaner and more maintainable
 - No over-engineering - kept changes minimal and practical
+
+---
+
+### Session 12 — 2026-01-13
+
+**Time:** Session complete
+
+**What was done:**
+1. **Fixed PDF Download Error (Turbopack incompatibility)**
+   - Error: `Cannot read properties of undefined (reading 'hasOwnProperty')`
+   - Root cause: `@react-pdf/renderer` client-side `pdf()` function incompatible with Next.js 16 Turbopack
+   - Solution: Moved PDF generation to server-side API routes
+   - Created `app/api/invoices/[id]/pdf/route.tsx` (authenticated)
+   - Created `app/api/public/invoices/[publicId]/pdf/route.tsx` (public)
+   - Updated `PdfDownload` component to fetch from API endpoints
+
+2. **Cleanup**
+   - Removed unused client-side PDF functions (`renderPdfToBlob`, `renderPdfToBuffer`, `downloadPdfBlob`)
+   - Kept only `generateInvoiceFilename` utility
+
+**Files created:**
+```
+app/api/invoices/[id]/pdf/route.tsx
+app/api/public/invoices/[publicId]/pdf/route.tsx
+```
+
+**Files modified:**
+```
+features/invoice/pdf/pdf-download.tsx     ✅ Uses API endpoints now
+shared/lib/pdf/renderer.ts                ✅ Removed unused functions
+shared/lib/pdf/index.ts                   ✅ Updated exports
+app/(dashboard)/invoices/[id]/page.tsx    ✅ Pass invoiceId prop
+app/i/[publicId]/page.tsx                 ✅ Pass publicId prop
+```
+
+**What's next:**
+- Test PDF download in browser
+- Deploy to Vercel
+
+**Blockers:** None
+
+**Notes:**
+- Build succeeds: `npm run build` ✅
+- Tests passing: 150/150 ✅
+- PDF now generated server-side (more reliable, better security)
+
+---
+
+### Session 13 — 2026-01-14
+
+**Time:** Session complete
+
+**What was done:**
+1. **Fixed PDF Download - Replaced @react-pdf/renderer with jsPDF**
+   - `@react-pdf/renderer` had React runtime conflicts with Next.js 16 (error #31)
+   - Switched to `jspdf` + `jspdf-autotable` for server-side PDF generation
+   - Removed `@react-pdf/renderer` dependency (saved 62 packages)
+
+2. **Code Review & Fixes (via specialized agents)**
+   - **Page overflow handling:** Added `checkPageOverflow()` function
+   - **Dynamic notes sections:** `renderNotesSection()` calculates height from content
+   - **Removed debug logs:** Cleaned API routes for production
+   - **ZodError handling:** Returns 400 for invalid IDs
+   - **User error feedback:** PdfDownload shows error message, "Retry Download" button
+   - **Input validation:** Guard for missing invoiceId/publicId
+   - **Cache headers:** Public PDF endpoint caches for 5 minutes
+   - **Constants extraction:** `MARGIN`, `LINE_HEIGHT`, `COLORS` for maintainability
+
+**Files modified:**
+```
+package.json                                ✅ Removed @react-pdf/renderer, added jspdf
+features/invoice/pdf/invoice-pdf.ts         ✅ Complete rewrite with jsPDF
+features/invoice/pdf/pdf-download.tsx       ✅ Error feedback, input validation
+app/api/invoices/[id]/pdf/route.ts          ✅ Clean error handling, no debug logs
+app/api/public/invoices/[publicId]/pdf/route.ts ✅ Cache headers, clean errors
+features/invoice/pdf/index.ts               ✅ Updated exports
+features/invoice/index.ts                   ✅ Updated exports
+```
+
+**Research findings:**
+- `@react-pdf/renderer` is known broken with Next.js 15+/16+ (React version mismatch)
+- `jsPDF` is the most common choice for production invoice apps
+- Server-side generation is best practice for security and consistency
+
+**What's next:**
+- Deploy to Vercel
+
+**Blockers:** None
+
+**Notes:**
+- Build succeeds: `npm run build` ✅
+- Tests passing: 150/150 ✅
+- PDF generation now uses `--webpack` dev mode (Turbopack optional via `npm run dev:turbo`)
+
+---
+
+### Session 14 — 2026-01-14
+
+**Time:** Session complete
+
+**What was done:**
+1. **Invoice UI/UX Redesign (Modern Minimal)**
+   - Deep research on invoice UI best practices (Stripe, FreshBooks, Wave, Xero patterns)
+   - Created shared `InvoiceDisplay` component for 1:1 web/PDF consistency
+   - New design features:
+     - Blue accent bar at top (brand color)
+     - Prominent "Amount Due" box with status indication
+     - Better typography hierarchy (clear visual weight)
+     - Improved table styling
+     - Payment instructions highlighted with blue background
+     - Notes section with subtle gray background
+     - F-pattern optimized layout (key info scannable in 2 seconds)
+
+2. **PDF Generator Rewrite**
+   - Completely rewrote `invoice-pdf.ts` to match web design
+   - Added rounded corners, accent colors, status-aware styling
+   - Paid invoices show green "Amount Paid" with date
+   - Overdue invoices show red status indicators
+
+**Design Improvements:**
+| Element | Before | After |
+|---------|--------|-------|
+| Header | Plain black text | Accent bar + better hierarchy |
+| Amount Due | Buried in totals | Prominent box, top-right |
+| Business info | Right-aligned | Left-aligned with logo support |
+| Table | Plain borders | Clean lines, better spacing |
+| Payment info | Gray box | Blue highlighted box |
+| Status | Text only | Color-coded indicators |
+
+**Files created:**
+```
+features/invoice/components/invoice-display.tsx  ✅ Shared display component
+```
+
+**Files modified:**
+```
+features/invoice/components/index.ts             ✅ Export InvoiceDisplay
+features/invoice/index.ts                        ✅ Export InvoiceDisplay
+features/invoice/pdf/invoice-pdf.ts              ✅ Complete redesign
+app/(dashboard)/invoices/[id]/page.tsx           ✅ Use InvoiceDisplay
+app/i/[publicId]/page.tsx                        ✅ Use InvoiceDisplay
+```
+
+**What's next:**
+- Test invoice display in browser
+- Deploy to Vercel
+
+**Blockers:** None
+
+**Notes:**
+- Build succeeds: `npm run build` ✅
+- Tests passing: 150/150 ✅
+- Web and PDF now have consistent "Modern Minimal" design
+- Logo support ready (uses `profile.logo_url`)
 
 ---
 
