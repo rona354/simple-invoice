@@ -20,9 +20,11 @@ Key files:
 - PLAN.md → Original feature plan
 - CHECKLIST.md → Feature checklist
 
-Current phase: Ready for Deployment
-Last completed: Session 10 - Build fixes, type errors resolved, 150 tests passing
-Next task: Deploy to Vercel
+Current phase: Deployed / Production Ready
+Last completed: Session 10 - Build fixes, git setup, pushed to GitHub
+Next task: Complete Vercel deployment (add env vars, update Supabase URLs)
+
+GitHub: https://github.com/rona354/simple-invoice
 
 Architecture: Pragmatic Clean Architecture
 - features/{domain}/ → components, actions, service, repository, schema, types
@@ -36,11 +38,12 @@ Architecture: Pragmatic Clean Architecture
 
 | Item | Value |
 |------|-------|
-| **Current Phase** | Ready for Deployment |
+| **Current Phase** | Production Ready |
 | **Phase Progress** | 100% |
-| **Overall Progress** | 100% (Build passing, 150 tests, ready to deploy) |
+| **Overall Progress** | 100% (Build ✅, Tests ✅, Git ✅, Vercel ready) |
 | **Last Updated** | 2026-01-13 |
 | **Tests** | 150 passing |
+| **GitHub** | https://github.com/rona354/simple-invoice |
 | **Blockers** | None |
 
 ---
@@ -766,15 +769,25 @@ app/(dashboard)/invoices/[id]/page.tsx          ✅ Fixed function calls
 app/i/[publicId]/page.tsx                       ✅ Fixed Badge variant
 ```
 
+4. **Git & GitHub Setup**
+   - Initialized git repository
+   - Created initial commit (136 files, 24,044 lines)
+   - Pushed to `github.com:rona354/simple-invoice`
+
 **What's next:**
-- Deploy to Vercel
+- Complete Vercel deployment:
+  1. Import repo at https://vercel.com/new
+  2. Add environment variables
+  3. Update Supabase redirect URLs
+  4. Update Google OAuth URLs (if using)
 
 **Blockers:** None
 
 **Notes:**
 - Build succeeds: `npm run build` ✅
 - Tests passing: 150/150 ✅
-- Dev server: http://localhost:3000
+- GitHub: https://github.com/rona354/simple-invoice
+- Dev server: `npm run dev` → http://localhost:3000
 
 ---
 
