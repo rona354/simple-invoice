@@ -1,1 +1,1 @@
-export { getCurrentUser } from './get-current-user'
+export { getCurrentUser, assertOwnership } from './get-current-user'

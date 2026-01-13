@@ -6,17 +6,6 @@ export interface AuthUser {
   created_at: string
 }
 
-export interface LoginCredentials {
-  email: string
-  password: string
-}
-
-export interface SignupCredentials {
-  email: string
-  password: string
-  confirmPassword: string
-}
-
 export type AuthProvider = 'google' | 'github'
 
 export function toAuthUser(user: User): AuthUser {

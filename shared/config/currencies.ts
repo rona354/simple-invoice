@@ -14,14 +14,3 @@ export const CURRENCY_OPTIONS = [
   { value: 'IDR', label: 'IDR - Indonesian Rupiah' },
   { value: 'SGD', label: 'SGD - Singapore Dollar' },
 ] as const satisfies readonly { value: Currency; label: string }[]
-
-export const CURRENCY_SYMBOLS: Record<Currency, string> = {
-  USD: '$',
-  EUR: '€',
-  GBP: '£',
-  CAD: 'C$',
-  AUD: 'A$',
-  JPY: '¥',
-  IDR: 'Rp',
-  SGD: 'S$',
-}

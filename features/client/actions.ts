@@ -1,8 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { getCurrentUser } from '@/shared/lib/auth'
-import { handleActionError, ForbiddenError } from '@/shared/errors'
+import { getCurrentUser, assertOwnership } from '@/shared/lib/auth'
+import { handleActionError } from '@/shared/errors'
 import { clientService } from './service'
 import { clientFormSchema, clientIdSchema, clientSearchSchema } from './schema'
 import type { ActionResult } from '@/shared/types'
@@ -33,9 +33,7 @@ export async function getClient(
     const validated = clientIdSchema.parse({ id })
     const client = await clientService.getById(validated.id)
 
-    if (client.user_id !== user.id) {
-      throw new ForbiddenError('Not authorized to access this client')
-    }
+    assertOwnership(client, user.id, 'client')
 
     return { success: true, data: { client } }
   } catch (error) {
@@ -83,9 +81,7 @@ export async function updateClient(
     const idValidated = clientIdSchema.parse({ id })
     const existing = await clientService.getById(idValidated.id)
 
-    if (existing.user_id !== user.id) {
-      throw new ForbiddenError('Not authorized to update this client')
-    }
+    assertOwnership(existing, user.id, 'client', 'update')
 
     const dataValidated = clientFormSchema.partial().parse(formData)
     const client = await clientService.update(idValidated.id, dataValidated)
@@ -107,9 +103,7 @@ export async function deleteClient(
     const validated = clientIdSchema.parse({ id })
     const existing = await clientService.getById(validated.id)
 
-    if (existing.user_id !== user.id) {
-      throw new ForbiddenError('Not authorized to delete this client')
-    }
+    assertOwnership(existing, user.id, 'client', 'delete')
 
     await clientService.delete(validated.id)
 

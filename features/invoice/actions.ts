@@ -2,8 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { createServerClient } from '@/shared/lib/supabase'
-import { getCurrentUser } from '@/shared/lib/auth'
-import { handleActionError, ForbiddenError } from '@/shared/errors'
+import { getCurrentUser, assertOwnership } from '@/shared/lib/auth'
+import { handleActionError } from '@/shared/errors'
 import { invoiceService } from './service'
 import { invoiceFormSchema, updateStatusSchema, invoiceIdSchema } from './schema'
 import { generateInvoiceNumber } from './utils'
@@ -38,9 +38,7 @@ export async function getInvoice(
     const validated = invoiceIdSchema.parse({ id })
     const invoice = await invoiceService.getByIdWithProfile(validated.id)
 
-    if (invoice.user_id !== user.id) {
-      throw new ForbiddenError('Not authorized to access this invoice')
-    }
+    assertOwnership(invoice, user.id, 'invoice')
 
     return { success: true, data: { invoice } }
   } catch (error) {
@@ -72,9 +70,7 @@ export async function updateInvoice(
     const idValidated = invoiceIdSchema.parse({ id })
     const existing = await invoiceService.getById(idValidated.id)
 
-    if (existing.user_id !== user.id) {
-      throw new ForbiddenError('Not authorized to update this invoice')
-    }
+    assertOwnership(existing, user.id, 'invoice', 'update')
 
     const dataValidated = invoiceFormSchema.partial().parse(formData)
     await invoiceService.update(idValidated.id, dataValidated)
@@ -97,9 +93,7 @@ export async function updateInvoiceStatus(
     const validated = updateStatusSchema.parse({ id, status })
     const existing = await invoiceService.getById(validated.id)
 
-    if (existing.user_id !== user.id) {
-      throw new ForbiddenError('Not authorized to update this invoice')
-    }
+    assertOwnership(existing, user.id, 'invoice', 'update')
 
     const invoice = await invoiceService.updateStatus(validated.id, validated.status)
 
@@ -120,9 +114,7 @@ export async function deleteInvoice(
     const validated = invoiceIdSchema.parse({ id })
     const existing = await invoiceService.getById(validated.id)
 
-    if (existing.user_id !== user.id) {
-      throw new ForbiddenError('Not authorized to delete this invoice')
-    }
+    assertOwnership(existing, user.id, 'invoice', 'delete')
 
     await invoiceService.delete(validated.id)
 
@@ -143,9 +135,7 @@ export async function duplicateInvoice(
     const validated = invoiceIdSchema.parse({ id })
     const existing = await invoiceService.getById(validated.id)
 
-    if (existing.user_id !== user.id) {
-      throw new ForbiddenError('Not authorized to duplicate this invoice')
-    }
+    assertOwnership(existing, user.id, 'invoice', 'duplicate')
 
     const newNumber = await generateInvoiceNumber(user.id, supabase)
     const invoice = await invoiceService.duplicate(validated.id, user.id, newNumber)

@@ -17,12 +17,11 @@ Workspace: /Users/royan.fauzan/Developer/rona354/simple-invoice/
 Key files:
 - ARCHITECTURE.md → Clean architecture plan
 - PROGRESS.md → This file (current status)
-- PLAN.md → Original feature plan
-- CHECKLIST.md → Feature checklist
+- PLAN.md → Original feature plan (historical)
 
-Current phase: Deployed / Production Ready
-Last completed: Session 10 - Build fixes, git setup, pushed to GitHub
-Next task: Complete Vercel deployment (add env vars, update Supabase URLs)
+Current phase: Production Ready (Cleaned)
+Last completed: Session 11 - Codebase cleanup, dead code removal, DRY consolidation
+Next task: Deploy to Vercel
 
 GitHub: https://github.com/rona354/simple-invoice
 
@@ -788,6 +787,86 @@ app/i/[publicId]/page.tsx                       ✅ Fixed Badge variant
 - Tests passing: 150/150 ✅
 - GitHub: https://github.com/rona354/simple-invoice
 - Dev server: `npm run dev` → http://localhost:3000
+
+---
+
+### Session 11 — 2026-01-13
+
+**Time:** Session complete
+
+**What was done:**
+1. **Dead Code Cleanup (~200 lines removed)**
+   - Deleted `useLocalStorage` hook (unused)
+   - Removed unused types: `PaginationParams`, `PaginatedResult`, `FilterParams`, `SortDirection`, `SortParams`
+   - Removed unused error classes: `ConflictError`, `assertDefined`, `isAppError`
+   - Removed unused config: `CURRENCY_SYMBOLS`, `SUPPORTED_DATE_FORMATS`
+   - Removed unused auth types: `LoginCredentials`, `SignupCredentials`
+   - Removed unused profile schemas: `logoUploadSchema`, `profileIdSchema`, `LogoUploadInput`
+   - Removed `SkeletonForm` component (unused)
+
+2. **Documentation Cleanup**
+   - Deleted `CHECKLIST.md` (obsolete, superseded by PROGRESS.md)
+   - Deleted `QUICKSTART.md` (obsolete, project complete)
+   - Rewrote `README.md` as production-ready documentation
+   - Improved `.env.local.example` with descriptive comments
+
+3. **DRY Consolidation (~100 lines saved)**
+   - Created `shared/layout/icons.tsx` - consolidated 4 duplicate icon components
+   - Created `shared/layout/navigation.ts` - consolidated duplicate nav config
+   - Refactored `sidebar.tsx` and `mobile-nav.tsx` to use shared icons/navigation
+   - Created `assertOwnership()` utility in `shared/lib/auth`
+   - Refactored 8 ownership checks in invoice/client actions to use shared utility
+
+**Files deleted:**
+```
+shared/hooks/use-local-storage.ts
+CHECKLIST.md
+QUICKSTART.md
+```
+
+**Files created:**
+```
+shared/layout/icons.tsx
+shared/layout/navigation.ts
+```
+
+**Files modified:**
+```
+shared/hooks/index.ts                           ✅ Removed useLocalStorage export
+shared/types/common.ts                          ✅ Removed unused types
+shared/types/index.ts                           ✅ Updated exports
+shared/errors/app-error.ts                      ✅ Removed ConflictError
+shared/errors/handlers.ts                       ✅ Removed unused functions
+shared/errors/index.ts                          ✅ Updated exports
+shared/config/currencies.ts                     ✅ Removed CURRENCY_SYMBOLS
+shared/config/locales.ts                        ✅ Removed SUPPORTED_DATE_FORMATS
+shared/config/index.ts                          ✅ Updated exports
+shared/components/ui/skeleton.tsx               ✅ Removed SkeletonForm
+shared/components/ui/index.ts                   ✅ Updated exports
+shared/layout/sidebar.tsx                       ✅ Use shared icons/navigation
+shared/layout/mobile-nav.tsx                    ✅ Use shared icons/navigation
+shared/lib/auth/get-current-user.ts             ✅ Added assertOwnership
+shared/lib/auth/index.ts                        ✅ Export assertOwnership
+features/auth/types.ts                          ✅ Removed unused credential types
+features/profile/schema.ts                      ✅ Removed unused schemas
+features/invoice/actions.ts                     ✅ Use assertOwnership
+features/client/actions.ts                      ✅ Use assertOwnership
+README.md                                       ✅ Complete rewrite
+.env.local.example                              ✅ Added descriptive comments
+```
+
+**What's next:**
+- Deploy to Vercel
+- Add Resend API key for email (optional)
+- Add Upstash for rate limiting (optional)
+
+**Blockers:** None
+
+**Notes:**
+- Build succeeds: `npm run build` ✅
+- Tests passing: 150/150 ✅
+- Codebase significantly cleaner and more maintainable
+- No over-engineering - kept changes minimal and practical
 
 ---
 

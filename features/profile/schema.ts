@@ -19,19 +19,4 @@ export const profileFormSchema = z.object({
   date_format: z.string().default('MM/DD/YYYY'),
 })
 
-export const logoUploadSchema = z.object({
-  file: z.instanceof(File).refine(
-    (file) => file.size <= 2 * 1024 * 1024,
-    'File must be less than 2MB'
-  ).refine(
-    (file) => ['image/jpeg', 'image/png', 'image/webp'].includes(file.type),
-    'File must be a valid image (JPEG, PNG, or WebP)'
-  ),
-})
-
-export const profileIdSchema = z.object({
-  id: z.string().uuid('Invalid profile ID'),
-})
-
 export type ProfileFormInput = z.infer<typeof profileFormSchema>
-export type LogoUploadInput = z.infer<typeof logoUploadSchema>

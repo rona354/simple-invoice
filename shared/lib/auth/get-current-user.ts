@@ -1,5 +1,5 @@
 import { createServerClient } from '@/shared/lib/supabase'
-import { UnauthorizedError } from '@/shared/errors'
+import { UnauthorizedError, ForbiddenError } from '@/shared/errors'
 
 export async function getCurrentUser() {
   const supabase = await createServerClient()
@@ -10,4 +10,15 @@ export async function getCurrentUser() {
   }
 
   return user
+}
+
+export function assertOwnership(
+  resource: { user_id: string },
+  userId: string,
+  resourceName: string,
+  action: 'access' | 'update' | 'delete' | 'duplicate' = 'access'
+): void {
+  if (resource.user_id !== userId) {
+    throw new ForbiddenError(`Not authorized to ${action} this ${resourceName}`)
+  }
 }

@@ -14,11 +14,8 @@ export const LOCALE_OPTIONS = [
   { value: 'ja-JP', label: 'Japanese' },
 ] as const satisfies readonly { value: Locale; label: string }[]
 
-export const SUPPORTED_DATE_FORMATS = [
-  'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', 'DD.MM.YYYY',
-] as const
-
-export type DateFormat = (typeof SUPPORTED_DATE_FORMATS)[number]
+const DATE_FORMATS = ['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', 'DD.MM.YYYY'] as const
+export type DateFormat = (typeof DATE_FORMATS)[number]
 
 export const DATE_FORMAT_OPTIONS = [
   { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },

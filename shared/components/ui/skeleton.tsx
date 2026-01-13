@@ -30,29 +30,4 @@ function SkeletonCard() {
   )
 }
 
-function SkeletonForm() {
-  return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-4">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-        <div className="space-y-4">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-10 w-full" />
-        </div>
-      </div>
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-24 w-full" />
-      </div>
-    </div>
-  )
-}
-
-export { Skeleton, SkeletonCard, SkeletonForm }
+export { Skeleton, SkeletonCard }

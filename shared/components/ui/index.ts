@@ -12,4 +12,4 @@ export {
   CardFooter,
 } from './card'
 export { Spinner, Loading } from './spinner'
-export { Skeleton, SkeletonCard, SkeletonForm } from './skeleton'
+export { Skeleton, SkeletonCard } from './skeleton'

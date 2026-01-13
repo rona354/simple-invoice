@@ -18,26 +18,3 @@ export interface Timestamps {
   created_at: string
   updated_at: string
 }
-
-export interface PaginationParams {
-  limit?: number
-  offset?: number
-}
-
-export interface PaginatedResult<T> {
-  data: T[]
-  total: number
-  hasMore: boolean
-}
-
-export interface FilterParams {
-  search?: string
-  status?: InvoiceStatus | 'all'
-}
-
-export type SortDirection = 'asc' | 'desc'
-
-export interface SortParams {
-  field: string
-  direction: SortDirection
-}

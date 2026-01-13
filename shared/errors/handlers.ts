@@ -37,16 +37,3 @@ export function handleActionError<T = void>(error: unknown): ActionResult<T> {
     code: 'INTERNAL_ERROR',
   }
 }
-
-export function assertDefined<T>(
-  value: T | null | undefined,
-  resource: string
-): asserts value is T {
-  if (value === null || value === undefined) {
-    throw new AppError(`${resource} not found`, 'NOT_FOUND', 404)
-  }
-}
-
-export function isAppError(error: unknown): error is AppError {
-  return error instanceof AppError
-}
