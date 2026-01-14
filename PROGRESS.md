@@ -11,8 +11,8 @@ Resume Simple Invoice development.
 
 Workspace: /Users/royan.fauzan/Developer/rona354/simple-invoice/
 
-Current phase: Post-Launch (v1.3) - Feature Development
-Next task: Test guest mode sharing features locally
+Current phase: Post-Launch (v1.4) - Complete
+Next task: Deploy changes to production
 
 GitHub: https://github.com/rona354/simple-invoice
 Live: https://simple-invoice-chi.vercel.app
@@ -29,8 +29,8 @@ Architecture: Pragmatic Clean Architecture
 
 | Item | Value |
 |------|-------|
-| **Phase** | Post-Launch (v1.3) |
-| **Progress** | WhatsApp Send Feature Added |
+| **Phase** | Post-Launch (v1.4) |
+| **Progress** | Security Hardening |
 | **Tests** | 150 passing |
 | **Build** | Passing |
 | **Blockers** | None |
@@ -53,6 +53,7 @@ Architecture: Pragmatic Clean Architecture
 | 10 | WhatsApp Send Feature | Done |
 | 11 | Share PDF (Web Share API) | Done |
 | 12 | Guest Mode: Share PDF & WhatsApp | Done |
+| 13 | Security Hardening (v1.4) | Done |
 
 ---
 
@@ -71,6 +72,52 @@ Architecture: Pragmatic Clean Architecture
 - [x] AlternativeTo (submitted, pending approval)
 - [ ] Product Hunt (optional)
 - [ ] SaaSHub (optional)
+
+---
+
+## Session 2026-01-15: Security Hardening
+
+**Issue:** Database review by specialized agents identified critical security gaps.
+
+**Findings (from 3 parallel agent reviews):**
+1. **CRITICAL**: Middleware not executing (wrong filename)
+2. **CRITICAL**: Missing RLS policies (not version-controlled)
+3. **HIGH**: `getInvoices` not filtering by user_id
+
+**Fixes Applied:**
+
+1. **Middleware Fix:**
+   - Renamed `proxy.ts` → `middleware.ts`
+   - Renamed function `proxy` → `middleware`
+
+2. **Security Migration Created:**
+   ```
+   supabase/migrations/20260115_security_rls_indexes.sql
+   ```
+   - RLS policies for `invoices`, `clients`, `profiles`, `guest_attempts`
+   - Performance indexes: `idx_invoices_public_id`, `idx_invoices_user_status_created`, `idx_invoices_user_created`, `idx_clients_user_name`
+
+3. **User Filter Fix:**
+   - `actions.ts`: Pass `user.id` to `invoiceService.list()`
+   - `service.ts`: Accept `userId` parameter
+   - `repository.ts`: Add `.eq('user_id', userId)` filter
+
+**Files Modified:**
+```
+middleware.ts                       # Renamed from proxy.ts, function renamed
+features/invoice/actions.ts         # Pass user.id to service
+features/invoice/service.ts         # Accept userId parameter
+features/invoice/repository.ts      # Add user_id filter
+```
+
+**Files Created:**
+```
+supabase/migrations/20260115_security_rls_indexes.sql  # RLS + indexes
+```
+
+**Applied to Supabase:** Yes (2026-01-15)
+- RLS enabled on all tables
+- 4 performance indexes created
 
 ---
 
@@ -184,7 +231,7 @@ app/(dashboard)/invoices/[id]/page.tsx # Add button to detail page
 
 **Changes:**
 ```
-proxy.ts
+middleware.ts (was proxy.ts, renamed in 2026-01-15 session)
 - Added extensions to matcher exclusion: html, xml, txt, webmanifest
 
 shared/lib/supabase/middleware.ts

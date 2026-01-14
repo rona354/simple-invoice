@@ -50,9 +50,9 @@ export async function getInvoices(
   filter?: InvoiceFilter
 ): Promise<ActionResult<{ invoices: Invoice[]; total: number }>> {
   try {
-    await getCurrentUser()
+    const user = await getCurrentUser()
 
-    const result = await invoiceService.list(filter)
+    const result = await invoiceService.list(user.id, filter)
 
     return { success: true, data: result }
   } catch (error) {

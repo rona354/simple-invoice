@@ -86,12 +86,13 @@ export const invoiceRepository = {
     return data as InvoiceWithProfile
   },
 
-  async findMany(filter: InvoiceFilter = {}): Promise<{ invoices: Invoice[]; total: number }> {
+  async findMany(userId: string, filter: InvoiceFilter = {}): Promise<{ invoices: Invoice[]; total: number }> {
     const supabase = await createServerClient()
 
     let query = supabase
       .from('invoices')
       .select('*', { count: 'exact' })
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
     if (filter.status && filter.status !== 'all') {

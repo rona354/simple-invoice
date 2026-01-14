@@ -76,8 +76,8 @@ export const invoiceService = {
     return invoice
   },
 
-  async list(filter: InvoiceFilter = {}): Promise<{ invoices: Invoice[]; total: number }> {
-    return invoiceRepository.findMany(filter)
+  async list(userId: string, filter: InvoiceFilter = {}): Promise<{ invoices: Invoice[]; total: number }> {
+    return invoiceRepository.findMany(userId, filter)
   },
 
   async update(id: string, formData: Partial<InvoiceFormInput>): Promise<Invoice> {
