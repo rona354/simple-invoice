@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { getInvoice, PdfDownload, getInvoiceDisplayStatus, InvoiceDisplay } from '@/features/invoice'
-import { Button, Badge } from '@/shared/components/ui'
+import { getInvoice, PdfDownload, PdfShare, getInvoiceDisplayStatus, InvoiceDisplay, WhatsAppSend } from '@/features/invoice'
+import { Badge } from '@/shared/components/ui'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -38,9 +38,14 @@ export default async function ViewInvoicePage({ params }: PageProps) {
           ← Back to Dashboard
         </Link>
         <div className="flex gap-2">
-          <Link href={`/invoices/${id}/edit`}>
-            <Button variant="outline" size="sm">Edit</Button>
+          <Link
+            href={`/invoices/${id}/edit`}
+            className="inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 focus-visible:ring-gray-400 h-8 px-3 text-sm"
+          >
+            Edit
           </Link>
+          <WhatsAppSend invoice={invoice} size="sm" />
+          <PdfShare invoiceId={invoice.id} invoiceNumber={invoice.invoice_number} size="sm" />
           <PdfDownload invoiceId={invoice.id} size="sm" />
         </div>
       </div>

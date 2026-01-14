@@ -55,6 +55,7 @@ export {
   InvoiceList,
   InvoiceForm,
   InvoiceDisplay,
+  WhatsAppSend,
 } from './components'
 
-export { renderInvoiceToBuffer, PdfDownload } from './pdf'
+export { renderInvoiceToBuffer, PdfDownload, PdfShare } from './pdf'

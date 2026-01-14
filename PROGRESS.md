@@ -11,8 +11,8 @@ Resume Simple Invoice development.
 
 Workspace: /Users/royan.fauzan/Developer/rona354/simple-invoice/
 
-Current phase: Post-Launch (v1.2) - SEO & Marketing
-Next task: Complete directory submissions, then new features
+Current phase: Post-Launch (v1.3) - Feature Development
+Next task: Test WhatsApp feature, then continue new features
 
 GitHub: https://github.com/rona354/simple-invoice
 Live: https://simple-invoice-chi.vercel.app
@@ -29,8 +29,8 @@ Architecture: Pragmatic Clean Architecture
 
 | Item | Value |
 |------|-------|
-| **Phase** | Post-Launch (v1.2) |
-| **Progress** | SEO Complete, Marketing In Progress |
+| **Phase** | Post-Launch (v1.3) |
+| **Progress** | WhatsApp Send Feature Added |
 | **Tests** | 150 passing |
 | **Build** | Passing |
 | **Blockers** | None |
@@ -50,6 +50,8 @@ Architecture: Pragmatic Clean Architecture
 | 7 | Guest Mode (v1.1) | Done |
 | 8 | SEO & Branding (v1.2) | Done |
 | 9 | Google Search Console | Done |
+| 10 | WhatsApp Send Feature | Done |
+| 11 | Share PDF (Web Share API) | Done |
 
 ---
 
@@ -68,6 +70,58 @@ Architecture: Pragmatic Clean Architecture
 - [x] AlternativeTo (submitted, pending approval)
 - [ ] Product Hunt (optional)
 - [ ] SaaSHub (optional)
+
+---
+
+## Session 2026-01-14 (3): Share PDF Feature (Web Share API)
+
+**Feature:** Share PDF directly via native share sheet (WhatsApp, Telegram, etc.)
+
+**Implementation:**
+- Uses Web Share API (navigator.share with files)
+- Falls back gracefully (button hidden if not supported)
+- Browser support: ~92% (Chrome, Safari, Edge, mobile browsers)
+- Firefox desktop: Not supported (button won't appear)
+
+**Files Created:**
+```
+features/invoice/pdf/pdf-share.tsx   # Share PDF component
+```
+
+**Files Modified:**
+```
+features/invoice/pdf/index.ts        # Export PdfShare
+features/invoice/index.ts            # Export PdfShare
+app/(dashboard)/invoices/[id]/page.tsx # Add Share PDF button
+```
+
+**UI:** Share PDF button between WhatsApp and Download PDF buttons
+
+---
+
+## Session 2026-01-14 (2): WhatsApp Send Feature
+
+**Feature:** Send invoice via WhatsApp button
+
+**Implementation:**
+- Uses wa.me click-to-chat links (free, no API)
+- Pre-fills recipient from client_phone if available
+- Message includes invoice number, amount, due date, public URL
+
+**Files Created:**
+```
+features/invoice/whatsapp.ts         # Utility functions
+features/invoice/components/whatsapp-send.tsx  # Button component
+```
+
+**Files Modified:**
+```
+features/invoice/components/index.ts  # Export WhatsAppSend
+features/invoice/index.ts             # Export WhatsAppSend
+app/(dashboard)/invoices/[id]/page.tsx # Add button to detail page
+```
+
+**UI:** Green WhatsApp button between Edit and Download PDF buttons
 
 ---
 
