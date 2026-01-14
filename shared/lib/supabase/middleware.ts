@@ -52,7 +52,8 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname === '/' ||
     request.nextUrl.pathname.startsWith('/i/') ||
     request.nextUrl.pathname.startsWith('/api/guest/') ||
-    request.nextUrl.pathname.startsWith('/api/public/')
+    request.nextUrl.pathname.startsWith('/api/public/') ||
+    request.nextUrl.pathname.startsWith('/opengraph-image')
 
   if (!user && !isAuthPage && !isPublicPage) {
     const url = request.nextUrl.clone()
