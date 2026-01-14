@@ -51,6 +51,7 @@ export async function updateSession(request: NextRequest) {
   const isPublicPage =
     request.nextUrl.pathname === '/' ||
     request.nextUrl.pathname.startsWith('/i/') ||
+    request.nextUrl.pathname.startsWith('/g/') ||
     request.nextUrl.pathname.startsWith('/api/guest/') ||
     request.nextUrl.pathname.startsWith('/api/public/') ||
     request.nextUrl.pathname.startsWith('/opengraph-image')

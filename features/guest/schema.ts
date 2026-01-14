@@ -14,6 +14,7 @@ export const guestInvoiceFormSchema = z.object({
 
   to_name: z.string().min(1, 'Client name is required'),
   to_email: z.string().email('Invalid email').optional().or(z.literal('')),
+  to_phone: z.string().optional(),
   to_address: z.string().optional(),
 
   items: z.array(guestLineItemSchema).min(1, 'At least one item is required'),

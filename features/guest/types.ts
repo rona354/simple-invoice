@@ -20,6 +20,7 @@ export interface GuestInvoice {
   to: {
     name: string
     email?: string
+    phone?: string
     address?: string
   }
 

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
-import { renderGuestInvoiceToBuffer } from '@/features/guest/pdf'
-import type { GuestInvoice } from '@/features/guest'
 
 export const runtime = 'nodejs'
 
@@ -60,27 +58,6 @@ export async function POST(request: NextRequest) {
       ?? request.headers.get('x-real-ip')
       ?? '0.0.0.0'
 
-    const { data: limitCheck, error: limitError } = await supabase
-      .rpc('check_guest_limit', {
-        p_fingerprint: fingerprint,
-        p_ip: ip,
-      })
-
-    if (limitError) {
-      console.error('Rate limit check error:', limitError)
-    }
-
-    if (limitCheck && limitCheck[0] && !limitCheck[0].allowed) {
-      return NextResponse.json(
-        {
-          error: 'limit_exceeded',
-          reason: limitCheck[0].reason,
-          message: 'You have already used your free invoice. Sign up to create more!',
-        },
-        { status: 429 }
-      )
-    }
-
     const { error: upsertError } = await supabase
       .from('guest_attempts')
       .upsert(
@@ -89,29 +66,26 @@ export async function POST(request: NextRequest) {
           fingerprint,
           ip_address: ip,
           user_agent: request.headers.get('user-agent') ?? null,
-          pdf_generated_at: new Date().toISOString(),
+          invoice_data: invoice,
         },
         { onConflict: 'invoice_id' }
       )
 
     if (upsertError) {
-      console.error('Guest attempt upsert error:', upsertError)
+      console.error('Guest share upsert error:', upsertError)
+      return NextResponse.json(
+        { error: 'Failed to save invoice' },
+        { status: 500 }
+      )
     }
 
-    const pdfBuffer = renderGuestInvoiceToBuffer(invoice as GuestInvoice)
-    const uint8Array = new Uint8Array(pdfBuffer)
+    const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://simple-invoice-chi.vercel.app'}/g/${invoiceId}`
 
-    return new NextResponse(uint8Array, {
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="invoice-${invoice.number}.pdf"`,
-        'Cache-Control': 'no-store',
-      },
-    })
+    return NextResponse.json({ publicUrl, invoiceId })
   } catch (error) {
-    console.error('Guest PDF generation error:', error)
+    console.error('Guest share error:', error)
     return NextResponse.json(
-      { error: 'Failed to generate PDF', message: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to share invoice' },
       { status: 500 }
     )
   }

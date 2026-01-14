@@ -12,7 +12,7 @@ Resume Simple Invoice development.
 Workspace: /Users/royan.fauzan/Developer/rona354/simple-invoice/
 
 Current phase: Post-Launch (v1.3) - Feature Development
-Next task: Test WhatsApp feature, then continue new features
+Next task: Test guest mode sharing features locally
 
 GitHub: https://github.com/rona354/simple-invoice
 Live: https://simple-invoice-chi.vercel.app
@@ -52,6 +52,7 @@ Architecture: Pragmatic Clean Architecture
 | 9 | Google Search Console | Done |
 | 10 | WhatsApp Send Feature | Done |
 | 11 | Share PDF (Web Share API) | Done |
+| 12 | Guest Mode: Share PDF & WhatsApp | Done |
 
 ---
 
@@ -70,6 +71,56 @@ Architecture: Pragmatic Clean Architecture
 - [x] AlternativeTo (submitted, pending approval)
 - [ ] Product Hunt (optional)
 - [ ] SaaSHub (optional)
+
+---
+
+## Session 2026-01-14 (4): Guest Mode Share Features
+
+**Feature:** Add Share PDF and WhatsApp buttons to guest mode
+
+**Implementation:**
+- Created guest-specific components (GuestWhatsAppSend, GuestPdfShare, GuestInvoiceDisplay, GuestPdfDownload)
+- Added phone field to guest invoice form (Bill To section)
+- WhatsApp: stores invoice to DB first, generates public URL, includes "View Invoice" link (same as signed-in mode)
+- Share PDF: uses POST to /api/guest/pdf, then Web Share API
+- Public view page at /g/[invoiceId] for shared guest invoices
+
+**Database:**
+```
+supabase/migrations/20260114_guest_invoice_data.sql  # Add invoice_data JSONB column
+```
+
+**Files Created:**
+```
+features/guest/whatsapp.ts                           # Guest WhatsApp utilities
+features/guest/components/guest-whatsapp-send.tsx    # WhatsApp button (async, stores first)
+features/guest/components/guest-pdf-share.tsx        # Share PDF button
+features/guest/components/guest-invoice-display.tsx  # Display component for public view
+features/guest/components/guest-pdf-download.tsx     # PDF download for public view
+app/api/guest/share/route.ts                         # Store invoice, return public URL
+app/api/guest/pdf/public/route.ts                    # Generate PDF for public view
+app/g/[invoiceId]/page.tsx                           # Public view page
+```
+
+**Files Modified:**
+```
+features/guest/schema.ts                      # Add to_phone field
+features/guest/types.ts                       # Add phone to GuestInvoice.to
+features/guest/components/index.ts            # Export new components
+features/guest/index.ts                       # Export whatsapp module
+features/guest/components/guest-invoice-creator.tsx # Add phone input + buttons
+shared/lib/supabase/middleware.ts             # Add /g/ to public routes
+```
+
+**UI:**
+- Phone input in Bill To section (after email, before address)
+- WhatsApp and Share PDF buttons above Download button
+- WhatsApp shows "Creating link..." while storing invoice
+
+**Behavior (now identical to signed-in mode):**
+- WhatsApp message includes "View Invoice: {public_url}"
+- Recipient can click link to view invoice online at /g/{invoiceId}
+- Public view has Download PDF button
 
 ---
 

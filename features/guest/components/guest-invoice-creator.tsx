@@ -14,6 +14,8 @@ import { generateFingerprint, generateInvoiceId } from '../fingerprint'
 import type { GuestInvoice } from '../types'
 import { GuestLimitReached } from './guest-limit-reached'
 import { ConversionModal } from './conversion-modal'
+import { GuestWhatsAppSend } from './guest-whatsapp-send'
+import { GuestPdfShare } from './guest-pdf-share'
 
 function buildGuestInvoice(data: GuestInvoiceFormData, invoiceId: string): GuestInvoice {
   return {
@@ -28,6 +30,7 @@ function buildGuestInvoice(data: GuestInvoiceFormData, invoiceId: string): Guest
     to: {
       name: data.to_name,
       email: data.to_email || undefined,
+      phone: data.to_phone || undefined,
       address: data.to_address || undefined,
     },
     items: data.items,
@@ -60,6 +63,7 @@ export function GuestInvoiceCreator() {
       from_address: '',
       to_name: '',
       to_email: '',
+      to_phone: '',
       to_address: '',
       items: [{ id: crypto.randomUUID(), description: '', quantity: 1, unit_price: 0 }],
       tax_rate: 0,
@@ -87,6 +91,12 @@ export function GuestInvoiceCreator() {
     return calculateInvoiceTotals(itemsForCalc, watchedTaxRate, 'fixed', 0)
   }, [watchedItems, watchedTaxRate])
 
+  const watchedValues = form.watch()
+  const liveInvoice = useMemo<GuestInvoice | null>(() => {
+    if (!invoiceId || !watchedValues.from_name) return null
+    return buildGuestInvoice(watchedValues, invoiceId)
+  }, [invoiceId, watchedValues])
+
   useEffect(() => {
     async function init() {
       const fp = await generateFingerprint()
@@ -107,6 +117,7 @@ export function GuestInvoiceCreator() {
           from_address: inv.from.address ?? '',
           to_name: inv.to.name,
           to_email: inv.to.email ?? '',
+          to_phone: inv.to.phone ?? '',
           to_address: inv.to.address ?? '',
           items: inv.items.map((i) => ({
             id: i.id,
@@ -279,6 +290,12 @@ export function GuestInvoiceCreator() {
                 error={form.formState.errors.to_email?.message}
                 {...form.register('to_email')}
               />
+              <Input
+                label="Phone"
+                type="tel"
+                placeholder="+1 234 567 8900"
+                {...form.register('to_phone')}
+              />
               <Textarea
                 label="Address"
                 rows={2}
@@ -404,7 +421,27 @@ export function GuestInvoiceCreator() {
             />
           </section>
 
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-wrap justify-center gap-3">
+              {liveInvoice && fingerprint && invoiceId && (
+                <GuestWhatsAppSend
+                  invoice={liveInvoice}
+                  fingerprint={fingerprint}
+                  invoiceId={invoiceId}
+                  disabled={!form.formState.isValid}
+                  size="md"
+                />
+              )}
+              {liveInvoice && fingerprint && invoiceId && (
+                <GuestPdfShare
+                  invoice={liveInvoice}
+                  fingerprint={fingerprint}
+                  invoiceId={invoiceId}
+                  disabled={!form.formState.isValid}
+                  size="md"
+                />
+              )}
+            </div>
             <Button
               type="button"
               size="lg"

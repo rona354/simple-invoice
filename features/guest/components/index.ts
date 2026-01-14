@@ -1,3 +1,7 @@
 export { GuestInvoiceCreator } from './guest-invoice-creator'
 export { GuestLimitReached } from './guest-limit-reached'
 export { ConversionModal } from './conversion-modal'
+export { GuestWhatsAppSend } from './guest-whatsapp-send'
+export { GuestPdfShare } from './guest-pdf-share'
+export { GuestInvoiceDisplay } from './guest-invoice-display'
+export { GuestPdfDownload } from './guest-pdf-download'
