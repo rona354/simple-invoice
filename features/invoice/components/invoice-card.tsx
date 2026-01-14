@@ -24,10 +24,10 @@ export function InvoiceCard({ invoice }: InvoiceCardProps) {
   return (
     <Link href={`/invoices/${invoice.id}`}>
       <Card className="p-4 hover:border-gray-300 transition-colors cursor-pointer">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium">{invoice.invoice_number}</p>
-            <p className="text-sm text-gray-500">{invoice.client_name}</p>
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <p className="font-medium truncate">{invoice.invoice_number}</p>
+            <p className="text-sm text-gray-500 truncate">{invoice.client_name}</p>
           </div>
           <StatusBadge status={displayStatus} />
         </div>

@@ -58,7 +58,7 @@ export function LineItemRow({
           <button
             type="button"
             onClick={onRemove}
-            className="text-gray-400 hover:text-red-500 transition-colors"
+            className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
             aria-label="Remove item"
           >
             <svg

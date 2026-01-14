@@ -74,8 +74,9 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile, locale?
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
   if (profile.business_name) {
-    doc.text(profile.business_name, MARGIN, y)
-    y += 5
+    const nameLines = doc.splitTextToSize(profile.business_name, 80)
+    doc.text(nameLines, MARGIN, y)
+    y += nameLines.length * 5
   }
 
   doc.setFontSize(9)
@@ -83,8 +84,9 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile, locale?
   doc.setTextColor(COLORS.textSecondary.r, COLORS.textSecondary.g, COLORS.textSecondary.b)
 
   if (profile.business_address) {
-    doc.text(profile.business_address, MARGIN, y)
-    y += 4
+    const addressLines = doc.splitTextToSize(profile.business_address, 80)
+    doc.text(addressLines, MARGIN, y)
+    y += addressLines.length * 4
   }
   if (profile.business_city || profile.business_postal_code) {
     const cityLine = [profile.business_city, profile.business_postal_code].filter(Boolean).join(', ')
@@ -127,18 +129,23 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile, locale?
   doc.text(invoice.invoice_number, rightX, rightY, { align: 'right' })
   rightY += 10
 
-  doc.setFontSize(9)
+  doc.setFontSize(8)
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text(t('invoice.issueDate'), rightX - 35, rightY)
+  doc.text(t('invoice.issueDate'), rightX, rightY, { align: 'right' })
+  rightY += 4
+  doc.setFontSize(10)
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
   doc.setFont('helvetica', 'bold')
   doc.text(formatDate(invoice.issue_date, language), rightX, rightY, { align: 'right' })
-  rightY += 5
+  rightY += 8
 
   if (invoice.due_date) {
+    doc.setFontSize(8)
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-    doc.text(t('invoice.dueDate'), rightX - 35, rightY)
+    doc.text(t('invoice.dueDate'), rightX, rightY, { align: 'right' })
+    rightY += 4
+    doc.setFontSize(10)
     if (isOverdue) {
       doc.setTextColor(COLORS.danger.r, COLORS.danger.g, COLORS.danger.b)
     } else {
@@ -170,8 +177,9 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile, locale?
   doc.setFontSize(11)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
-  doc.text(invoice.client_name, MARGIN, y)
-  y += 5
+  const clientNameLines = doc.splitTextToSize(invoice.client_name, 80)
+  doc.text(clientNameLines, MARGIN, y)
+  y += clientNameLines.length * 5
 
   doc.setFontSize(9)
   doc.setFont('helvetica', 'normal')
@@ -199,7 +207,9 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile, locale?
   }
 
   // Amount Due Box (right)
-  const boxWidth = 70
+  const amountText = formatCurrency(invoice.total_cents, invoice.currency)
+  const amountFontSize = amountText.length > 15 ? 12 : 16
+  const boxWidth = amountText.length > 15 ? 80 : 70
   const boxHeight = 28
   const boxX = PAGE_WIDTH - MARGIN - boxWidth
   const boxY = billToStartY - 2
@@ -208,19 +218,19 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile, locale?
   doc.setDrawColor(COLORS.border.r, COLORS.border.g, COLORS.border.b)
   doc.roundedRect(boxX, boxY, boxWidth, boxHeight, 2, 2, 'FD')
 
-  doc.setFontSize(7)
+  doc.setFontSize(8)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
   doc.text(isPaid ? t('invoice.amountPaid') : t('invoice.amountDue'), boxX + boxWidth / 2, boxY + 6, { align: 'center' })
 
-  doc.setFontSize(16)
+  doc.setFontSize(amountFontSize)
   doc.setFont('helvetica', 'bold')
   if (isPaid) {
     doc.setTextColor(COLORS.success.r, COLORS.success.g, COLORS.success.b)
   } else {
     doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
   }
-  doc.text(formatCurrency(invoice.total_cents, invoice.currency), boxX + boxWidth / 2, boxY + 15, { align: 'center' })
+  doc.text(amountText, boxX + boxWidth / 2, boxY + 15, { align: 'center' })
 
   doc.setFontSize(8)
   doc.setFont('helvetica', 'normal')
@@ -257,31 +267,34 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile, locale?
     head: [[t('invoice.description'), t('invoice.quantity'), t('invoice.rate'), t('invoice.amount')]],
     body: tableData.length > 0 ? tableData : [[t('invoice.noItems'), '', '', '']],
     theme: 'plain',
+    styles: {
+      cellPadding: { top: 6, bottom: 6, left: 4, right: 4 },
+      fontSize: 9,
+      overflow: 'linebreak',
+    },
     headStyles: {
-      fillColor: [255, 255, 255],
-      textColor: [COLORS.muted.r, COLORS.muted.g, COLORS.muted.b],
+      fillColor: [COLORS.bgSubtle.r, COLORS.bgSubtle.g, COLORS.bgSubtle.b],
+      textColor: [COLORS.textSecondary.r, COLORS.textSecondary.g, COLORS.textSecondary.b],
       fontStyle: 'bold',
       fontSize: 8,
-      cellPadding: { top: 3, bottom: 6, left: 0, right: 0 },
     },
     bodyStyles: {
       textColor: [COLORS.text.r, COLORS.text.g, COLORS.text.b],
-      fontSize: 10,
-      cellPadding: { top: 4, bottom: 4, left: 0, right: 0 },
+      fontSize: 9,
     },
     columnStyles: {
-      0: { cellWidth: 'auto' },
+      0: { cellWidth: 'auto', halign: 'left' },
       1: { cellWidth: 20, halign: 'center', textColor: [COLORS.textSecondary.r, COLORS.textSecondary.g, COLORS.textSecondary.b] },
-      2: { cellWidth: 30, halign: 'right', textColor: [COLORS.textSecondary.r, COLORS.textSecondary.g, COLORS.textSecondary.b] },
-      3: { cellWidth: 30, halign: 'right', fontStyle: 'bold' },
+      2: { cellWidth: 32, halign: 'right', textColor: [COLORS.textSecondary.r, COLORS.textSecondary.g, COLORS.textSecondary.b] },
+      3: { cellWidth: 32, halign: 'right', fontStyle: 'bold' },
     },
     margin: { left: MARGIN, right: MARGIN },
     tableLineColor: [COLORS.border.r, COLORS.border.g, COLORS.border.b],
-    tableLineWidth: 0.3,
+    tableLineWidth: 0.2,
     didDrawCell: (data) => {
       if (data.section === 'head') {
         doc.setDrawColor(COLORS.border.r, COLORS.border.g, COLORS.border.b)
-        doc.setLineWidth(0.5)
+        doc.setLineWidth(0.3)
         doc.line(data.cell.x, data.cell.y + data.cell.height, data.cell.x + data.cell.width, data.cell.y + data.cell.height)
       }
     },
@@ -349,7 +362,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile, locale?
     doc.setDrawColor(219, 234, 254)
     doc.roundedRect(MARGIN, y, CONTENT_WIDTH, boxHeight, 2, 2, 'FD')
 
-    doc.setFontSize(7)
+    doc.setFontSize(8)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(29, 78, 216)
     doc.text(t('invoice.paymentInstructions'), MARGIN + 8, y + 8)
@@ -370,7 +383,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile, locale?
     doc.setFillColor(COLORS.bgSubtle.r, COLORS.bgSubtle.g, COLORS.bgSubtle.b)
     doc.roundedRect(MARGIN, y, CONTENT_WIDTH, boxHeight, 2, 2, 'F')
 
-    doc.setFontSize(7)
+    doc.setFontSize(8)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
     doc.text(t('invoice.notes'), MARGIN + 8, y + 8)
@@ -387,7 +400,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile, locale?
     y = checkPageOverflow(doc, y, 25)
     const contentLines = doc.splitTextToSize(invoice.terms, CONTENT_WIDTH)
 
-    doc.setFontSize(7)
+    doc.setFontSize(8)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
     doc.text(t('invoice.termsAndConditions'), MARGIN, y)

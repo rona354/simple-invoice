@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useId } from 'react'
 import { Input, Spinner } from '@/shared/components/ui'
 import { useDebounce } from '@/shared/hooks'
 import { searchClients } from '../actions'
@@ -31,6 +31,7 @@ export function ClientAutocomplete({
 
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const listboxId = useId()
 
   const debouncedQuery = useDebounce(query, 300)
 
@@ -118,6 +119,10 @@ export function ClientAutocomplete({
     return parts.join(' • ')
   }
 
+  const activeDescendant = selectedIndex >= 0 && clients[selectedIndex]
+    ? `${listboxId}-option-${selectedIndex}`
+    : undefined
+
   return (
     <div ref={containerRef} className="relative">
       <Input
@@ -130,6 +135,11 @@ export function ClientAutocomplete({
         placeholder={placeholder}
         error={error}
         autoComplete="off"
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-autocomplete="list"
+        aria-controls={listboxId}
+        aria-activedescendant={activeDescendant}
       />
 
       {isLoading && (
@@ -139,10 +149,18 @@ export function ClientAutocomplete({
       )}
 
       {isOpen && clients.length > 0 && (
-        <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 shadow-lg">
+        <ul
+          id={listboxId}
+          role="listbox"
+          aria-label="Client suggestions"
+          className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+        >
           {clients.map((client, index) => (
             <li
               key={client.id}
+              id={`${listboxId}-option-${index}`}
+              role="option"
+              aria-selected={index === selectedIndex}
               onClick={() => handleClientClick(client)}
               onMouseEnter={() => setSelectedIndex(index)}
               className={`cursor-pointer px-3 py-2 ${

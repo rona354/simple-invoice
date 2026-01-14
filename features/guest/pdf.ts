@@ -8,6 +8,7 @@ import { getLanguageLocale, getCurrencyLocale } from '@/shared/utils'
 const MARGIN = 20
 const PAGE_WIDTH = 210
 const CONTENT_WIDTH = PAGE_WIDTH - 2 * MARGIN
+const FOOTER_MARGIN = 25
 
 const COLORS = {
   accent: { r: 37, g: 99, b: 235 },
@@ -38,6 +39,15 @@ function formatDate(dateString: string, language: Locale): string {
   }).format(new Date(dateString))
 }
 
+function checkPageOverflow(doc: jsPDF, y: number, requiredSpace: number): number {
+  const pageHeight = doc.internal.pageSize.getHeight()
+  if (y + requiredSpace > pageHeight - FOOTER_MARGIN) {
+    doc.addPage()
+    return MARGIN
+  }
+  return y
+}
+
 export function renderGuestInvoiceToBuffer(invoice: GuestInvoice, locale: Locale = 'en'): Buffer {
   const doc = new jsPDF()
 
@@ -53,11 +63,11 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice, locale: Locale
   let y = 0
 
   // Guest mode watermark bar
-  doc.setFillColor(254, 226, 226)
+  doc.setFillColor(239, 246, 255)
   doc.rect(0, 0, PAGE_WIDTH, 14, 'F')
   doc.setFontSize(9)
   doc.setFont('helvetica', 'bold')
-  doc.setTextColor(153, 27, 27)
+  doc.setTextColor(37, 99, 235)
   doc.text(t('guest.watermark'), PAGE_WIDTH / 2, 9, { align: 'center' })
 
   y = 14 + MARGIN
@@ -69,8 +79,9 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice, locale: Locale
   doc.setFontSize(12)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
-  doc.text(invoice.from.name, MARGIN, y)
-  y += 5
+  const fromNameLines = doc.splitTextToSize(invoice.from.name, 80)
+  doc.text(fromNameLines, MARGIN, y)
+  y += fromNameLines.length * 5
 
   doc.setFontSize(9)
   doc.setFont('helvetica', 'normal')
@@ -107,17 +118,22 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice, locale: Locale
   doc.text(invoice.number, rightX, rightY, { align: 'right' })
   rightY += 10
 
-  doc.setFontSize(9)
+  doc.setFontSize(8)
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text(t('invoice.issueDate'), rightX - 35, rightY)
+  doc.text(t('invoice.issueDate'), rightX, rightY, { align: 'right' })
+  rightY += 4
+  doc.setFontSize(10)
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
   doc.setFont('helvetica', 'bold')
   doc.text(formatDate(invoice.date, locale), rightX, rightY, { align: 'right' })
-  rightY += 5
+  rightY += 8
 
+  doc.setFontSize(8)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text(t('invoice.dueDate'), rightX - 35, rightY)
+  doc.text(t('invoice.dueDate'), rightX, rightY, { align: 'right' })
+  rightY += 4
+  doc.setFontSize(10)
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
   doc.setFont('helvetica', 'bold')
   doc.text(formatDate(invoice.due_date, locale), rightX, rightY, { align: 'right' })
@@ -142,8 +158,9 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice, locale: Locale
   doc.setFontSize(11)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
-  doc.text(invoice.to.name, MARGIN, y)
-  y += 5
+  const toNameLines = doc.splitTextToSize(invoice.to.name, 80)
+  doc.text(toNameLines, MARGIN, y)
+  y += toNameLines.length * 5
 
   doc.setFontSize(9)
   doc.setFont('helvetica', 'normal')
@@ -159,9 +176,15 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice, locale: Locale
     doc.text(invoice.to.email, MARGIN, y)
     y += 4
   }
+  if (invoice.to.phone) {
+    doc.text(invoice.to.phone, MARGIN, y)
+    y += 4
+  }
 
   // Amount Due Box (right)
-  const boxWidth = 70
+  const amountText = formatCurrency(totals.totalCents, invoice.currency)
+  const amountFontSize = amountText.length > 15 ? 12 : 16
+  const boxWidth = amountText.length > 15 ? 80 : 70
   const boxHeight = 28
   const boxX = PAGE_WIDTH - MARGIN - boxWidth
   const boxY = billToStartY - 2
@@ -170,15 +193,15 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice, locale: Locale
   doc.setDrawColor(COLORS.border.r, COLORS.border.g, COLORS.border.b)
   doc.roundedRect(boxX, boxY, boxWidth, boxHeight, 2, 2, 'FD')
 
-  doc.setFontSize(7)
+  doc.setFontSize(8)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
   doc.text(t('invoice.amountDue'), boxX + boxWidth / 2, boxY + 6, { align: 'center' })
 
-  doc.setFontSize(16)
+  doc.setFontSize(amountFontSize)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
-  doc.text(formatCurrency(totals.totalCents, invoice.currency), boxX + boxWidth / 2, boxY + 15, { align: 'center' })
+  doc.text(amountText, boxX + boxWidth / 2, boxY + 15, { align: 'center' })
 
   doc.setFontSize(8)
   doc.setFont('helvetica', 'normal')
@@ -241,6 +264,8 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice, locale: Locale
   const lastAutoTable = (doc as jsPDF & { lastAutoTable?: { finalY: number } }).lastAutoTable
   y = (lastAutoTable?.finalY ?? y + 50) + 15
 
+  y = checkPageOverflow(doc, y, 50)
+
   // === TOTALS SECTION ===
   const totalsX = PAGE_WIDTH - MARGIN - 80
   const valuesX = PAGE_WIDTH - MARGIN
@@ -277,13 +302,14 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice, locale: Locale
 
   // === NOTES SECTION ===
   if (invoice.notes) {
+    y = checkPageOverflow(doc, y, 30)
     const contentLines = doc.splitTextToSize(invoice.notes, CONTENT_WIDTH - 16)
     const noteBoxHeight = 12 + contentLines.length * 4 + 8
 
     doc.setFillColor(COLORS.bgSubtle.r, COLORS.bgSubtle.g, COLORS.bgSubtle.b)
     doc.roundedRect(MARGIN, y, CONTENT_WIDTH, noteBoxHeight, 2, 2, 'F')
 
-    doc.setFontSize(7)
+    doc.setFontSize(8)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
     doc.text(t('invoice.notes'), MARGIN + 8, y + 8)

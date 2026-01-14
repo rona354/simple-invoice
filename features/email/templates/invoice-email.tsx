@@ -115,10 +115,11 @@ const button = {
   borderRadius: '5px',
   color: '#fff',
   fontSize: '15px',
+  lineHeight: '16px',
   textDecoration: 'none',
   textAlign: 'center' as const,
   display: 'block',
-  padding: '12px 24px',
+  padding: '14px 24px',
 }
 
 const hr = {

@@ -364,9 +364,12 @@ export function GuestInvoiceCreator() {
                         type="button"
                         onClick={() => fields.length > 1 && remove(index)}
                         disabled={fields.length === 1}
-                        className="text-gray-400 hover:text-red-500 disabled:opacity-30"
+                        className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-red-500 disabled:opacity-30 transition-colors"
+                        aria-label="Remove item"
                       >
-                        ×
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                       </button>
                     </div>
                   </div>

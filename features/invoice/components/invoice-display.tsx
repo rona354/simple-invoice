@@ -134,8 +134,8 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
         </div>
 
         {/* Line Items Table */}
-        <div className="mb-8">
-          <table className="w-full">
+        <div className="mb-8 overflow-x-auto">
+          <table className="w-full min-w-[500px]">
             <thead>
               <tr className="border-b-2 border-gray-200">
                 <th className="py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
