@@ -8,6 +8,7 @@ import { useInvoiceForm, useInvoiceTotals, useInvoiceSubmit } from '../hooks'
 import { createInvoice, updateInvoice } from '../actions'
 import { LineItemRow } from './line-item-row'
 import { InvoiceTotals } from './invoice-totals'
+import { useTranslations } from '@/shared/i18n'
 import type { Invoice, Profile } from '../types'
 import type { Client } from '@/features/client'
 
@@ -18,6 +19,7 @@ interface InvoiceFormProps {
 
 export function InvoiceForm({ profile, invoice }: InvoiceFormProps) {
   const router = useRouter()
+  const t = useTranslations()
   const { form, fields, addItem, removeItem, isEditMode } = useInvoiceForm({
     profile,
     invoice,
@@ -78,7 +80,7 @@ export function InvoiceForm({ profile, invoice }: InvoiceFormProps) {
       )}
 
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900">Client Information</h2>
+        <h2 className="text-lg font-semibold text-gray-900">{t('invoice.clientInfo')}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <ClientAutocomplete
             value={watch('client_name')}
@@ -87,30 +89,30 @@ export function InvoiceForm({ profile, invoice }: InvoiceFormProps) {
             error={errors.client_name?.message}
           />
           <Input
-            label="Email"
+            label={t('invoice.clientEmail')}
             type="email"
             placeholder="client@example.com"
             error={errors.client_email?.message}
             {...register('client_email')}
           />
           <Input
-            label="Phone"
+            label={t('invoice.clientPhone')}
             type="tel"
             placeholder="+1 234 567 8900"
             error={errors.client_phone?.message}
             {...register('client_phone')}
           />
           <Input
-            label="Tax ID"
-            placeholder="Tax ID / VAT number"
+            label={t('invoice.clientTaxId')}
+            placeholder={t('invoice.clientTaxId')}
             error={errors.client_tax_id?.message}
             {...register('client_tax_id')}
           />
         </div>
         <Textarea
-          label="Address"
+          label={t('invoice.clientAddress')}
           rows={2}
-          placeholder="Street, City, Country"
+          placeholder={t('invoice.clientAddress')}
           error={errors.client_address?.message}
           {...register('client_address')}
         />
@@ -118,18 +120,18 @@ export function InvoiceForm({ profile, invoice }: InvoiceFormProps) {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Line Items</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('invoice.lineItems')}</h2>
           <Button type="button" variant="outline" size="sm" onClick={addItem}>
-            Add Item
+            {t('invoice.addItem')}
           </Button>
         </div>
 
         <div className="space-y-2">
           <div className="grid grid-cols-12 gap-2 text-sm font-medium text-gray-500">
-            <div className="col-span-5">Description</div>
-            <div className="col-span-2">Qty</div>
-            <div className="col-span-2">Rate</div>
-            <div className="col-span-2 text-right">Amount</div>
+            <div className="col-span-5">{t('invoice.description')}</div>
+            <div className="col-span-2">{t('invoice.quantity')}</div>
+            <div className="col-span-2">{t('invoice.rate')}</div>
+            <div className="col-span-2 text-right">{t('invoice.amount')}</div>
             <div className="col-span-1" />
           </div>
 
@@ -154,22 +156,22 @@ export function InvoiceForm({ profile, invoice }: InvoiceFormProps) {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900">Invoice Details</h2>
+        <h2 className="text-lg font-semibold text-gray-900">{t('invoice.invoiceDetails')}</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <Input
-            label="Due Date"
+            label={t('invoice.dueDate')}
             type="date"
             error={errors.due_date?.message}
             {...register('due_date')}
           />
           <Select
-            label="Currency"
+            label={t('invoice.currency')}
             error={errors.currency?.message}
             options={CURRENCY_OPTIONS}
             {...register('currency')}
           />
           <Input
-            label="Tax Rate (%)"
+            label={t('invoice.taxRate')}
             type="number"
             step="0.1"
             min="0"
@@ -182,18 +184,18 @@ export function InvoiceForm({ profile, invoice }: InvoiceFormProps) {
           <div className="flex gap-2">
             <div className="w-32">
               <Select
-                label="Discount"
+                label={t('invoice.discount')}
                 error={errors.discount_type?.message}
                 options={[
-                  { value: 'fixed', label: 'Fixed' },
-                  { value: 'percentage', label: 'Percentage' },
+                  { value: 'fixed', label: t('invoice.discountFixed') },
+                  { value: 'percentage', label: t('invoice.discountPercentage') },
                 ]}
                 {...register('discount_type')}
               />
             </div>
             <div className="flex-1">
               <Input
-                label={watch('discount_type') === 'percentage' ? 'Discount (%)' : 'Discount Amount'}
+                label={watch('discount_type') === 'percentage' ? t('invoice.discountPercent', { value: '' }) : t('invoice.discountAmount')}
                 type="number"
                 step="0.01"
                 min="0"
@@ -215,18 +217,18 @@ export function InvoiceForm({ profile, invoice }: InvoiceFormProps) {
       />
 
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900">Additional Information</h2>
+        <h2 className="text-lg font-semibold text-gray-900">{t('invoice.additionalInfo')}</h2>
         <Textarea
-          label="Notes"
+          label={t('invoice.notesLabel')}
           rows={3}
-          placeholder="Any additional notes for the client"
+          placeholder={t('invoice.notesPlaceholder')}
           error={errors.notes?.message}
           {...register('notes')}
         />
         <Textarea
-          label="Payment Instructions"
+          label={t('invoice.paymentInstructionsLabel')}
           rows={3}
-          placeholder="Bank details, payment methods, etc."
+          placeholder={t('invoice.paymentInstructionsPlaceholder')}
           error={errors.payment_instructions?.message}
           {...register('payment_instructions')}
         />
@@ -239,10 +241,10 @@ export function InvoiceForm({ profile, invoice }: InvoiceFormProps) {
           onClick={() => router.back()}
           disabled={isSubmitting}
         >
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button type="submit" loading={isSubmitting}>
-          {isEditMode ? 'Update Invoice' : 'Create Invoice'}
+          {isEditMode ? t('invoice.updateInvoice') : t('invoice.createInvoice')}
         </Button>
       </div>
     </form>

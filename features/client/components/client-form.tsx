@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Input } from '@/shared/components/ui'
+import { useTranslations } from '@/shared/i18n'
 import { clientFormSchema, type ClientFormData } from '../schema'
 import { createClient, updateClient } from '../actions'
 import type { Client } from '../types'
@@ -15,6 +16,7 @@ interface ClientFormProps {
 }
 
 export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
+  const t = useTranslations()
   const [error, setError] = useState<string | null>(null)
   const isEditing = !!client
 
@@ -62,60 +64,60 @@ export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
       )}
 
       <Input
-        label="Client Name"
-        placeholder="Client or Company Name"
+        label={t('client.clientName')}
+        placeholder={t('client.clientNamePlaceholder')}
         error={errors.name?.message}
         {...register('name')}
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
-          label="Email"
+          label={t('client.email')}
           type="email"
-          placeholder="client@example.com"
+          placeholder={t('client.emailPlaceholder')}
           error={errors.email?.message}
           {...register('email')}
         />
         <Input
-          label="Phone"
+          label={t('client.phone')}
           type="tel"
-          placeholder="+1 (555) 123-4567"
+          placeholder={t('client.phonePlaceholder')}
           error={errors.phone?.message}
           {...register('phone')}
         />
       </div>
 
       <Input
-        label="Address"
-        placeholder="123 Client Street"
+        label={t('client.address')}
+        placeholder={t('client.addressPlaceholder')}
         error={errors.address?.message}
         {...register('address')}
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Input
-          label="City"
-          placeholder="New York"
+          label={t('client.city')}
+          placeholder={t('client.cityPlaceholder')}
           error={errors.city?.message}
           {...register('city')}
         />
         <Input
-          label="Country"
-          placeholder="United States"
+          label={t('client.country')}
+          placeholder={t('client.countryPlaceholder')}
           error={errors.country?.message}
           {...register('country')}
         />
         <Input
-          label="Postal Code"
-          placeholder="10001"
+          label={t('client.postalCode')}
+          placeholder={t('client.postalCodePlaceholder')}
           error={errors.postal_code?.message}
           {...register('postal_code')}
         />
       </div>
 
       <Input
-        label="Tax ID"
-        placeholder="Client tax identification number"
+        label={t('client.taxId')}
+        placeholder={t('client.taxIdPlaceholder')}
         error={errors.tax_id?.message}
         {...register('tax_id')}
       />
@@ -123,11 +125,11 @@ export function ClientForm({ client, onSuccess, onCancel }: ClientFormProps) {
       <div className="flex justify-end gap-3 pt-4">
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
+            {t('common.cancel')}
           </Button>
         )}
         <Button type="submit" loading={isSubmitting}>
-          {isEditing ? 'Update Client' : 'Create Client'}
+          {isEditing ? t('client.updateClient') : t('client.createClient')}
         </Button>
       </div>
     </form>

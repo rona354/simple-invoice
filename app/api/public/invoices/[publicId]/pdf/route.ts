@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { invoiceService } from '@/features/invoice/service'
 import { renderInvoiceToBuffer } from '@/features/invoice/pdf/invoice-pdf'
 import { generateInvoiceFilename } from '@/shared/lib/pdf'
 import { AppError } from '@/shared/errors'
+import { getLocaleFromString } from '@/shared/i18n'
 
 const publicIdSchema = z.object({
   publicId: z.string().uuid(),
@@ -19,7 +21,10 @@ export async function GET(
     const validated = publicIdSchema.parse({ publicId })
     const invoice = await invoiceService.getByPublicId(validated.publicId)
 
-    const buffer = await renderInvoiceToBuffer(invoice)
+    const cookieStore = await cookies()
+    const locale = getLocaleFromString(cookieStore.get('NEXT_LOCALE')?.value)
+
+    const buffer = await renderInvoiceToBuffer(invoice, locale)
     const filename = generateInvoiceFilename(invoice.invoice_number)
 
     return new NextResponse(new Uint8Array(buffer), {

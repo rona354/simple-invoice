@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/shared/utils'
+import { useTranslations } from '@/shared/i18n'
 import { navigation } from './navigation'
 import { XIcon } from './icons'
 import { Logo } from './logo'
@@ -14,6 +15,7 @@ interface MobileNavProps {
 
 export function MobileNav({ open, onClose }: MobileNavProps) {
   const pathname = usePathname()
+  const t = useTranslations()
 
   if (!open) return null
 
@@ -43,7 +45,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               pathname === item.href || pathname.startsWith(item.href + '/')
             return (
               <Link
-                key={item.name}
+                key={item.nameKey}
                 href={item.href}
                 onClick={onClose}
                 className={cn(
@@ -59,7 +61,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
                     isActive ? 'text-gray-900' : 'text-gray-400'
                   )}
                 />
-                {item.name}
+                {t(item.nameKey)}
               </Link>
             )
           })}

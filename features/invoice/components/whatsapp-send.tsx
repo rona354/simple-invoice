@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { cn } from '@/shared/utils'
+import { useTranslations } from '@/shared/i18n'
 import { generateWhatsAppUrl } from '../whatsapp'
 import type { Invoice } from '../types'
 
@@ -12,6 +13,7 @@ interface WhatsAppSendProps {
 }
 
 export function WhatsAppSend({ invoice, size = 'md', className }: WhatsAppSendProps) {
+  const t = useTranslations()
   const [url, setUrl] = useState<string>('#')
 
   useEffect(() => {
@@ -52,7 +54,7 @@ export function WhatsAppSend({ invoice, size = 'md', className }: WhatsAppSendPr
         sizes[size],
         className
       )}
-      aria-label={`Send invoice ${invoice.invoice_number} via WhatsApp`}
+      aria-label={t('invoice.sendWhatsApp')}
     >
       <WhatsAppIcon />
       <span>WhatsApp</span>

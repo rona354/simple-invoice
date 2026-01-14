@@ -1,9 +1,41 @@
+const CURRENCY_LOCALE_MAP: Record<string, string> = {
+  IDR: 'id-ID',
+  USD: 'en-US',
+  EUR: 'de-DE',
+  GBP: 'en-GB',
+  JPY: 'ja-JP',
+  SGD: 'en-SG',
+  MYR: 'ms-MY',
+  AUD: 'en-AU',
+  CAD: 'en-CA',
+  CNY: 'zh-CN',
+  INR: 'en-IN',
+  KRW: 'ko-KR',
+  THB: 'th-TH',
+  VND: 'vi-VN',
+  PHP: 'en-PH',
+}
+
+export function getCurrencyLocale(currency: string): string {
+  return CURRENCY_LOCALE_MAP[currency] ?? 'en-US'
+}
+
+const LANGUAGE_LOCALE_MAP: Record<string, string> = {
+  en: 'en-US',
+  id: 'id-ID',
+}
+
+export function getLanguageLocale(language: string): string {
+  return LANGUAGE_LOCALE_MAP[language] ?? 'en-US'
+}
+
 export function formatCurrency(
   cents: number,
   currency: string = 'USD',
-  locale: string = 'en-US'
+  locale?: string
 ): string {
-  return new Intl.NumberFormat(locale, {
+  const effectiveLocale = locale ?? getCurrencyLocale(currency)
+  return new Intl.NumberFormat(effectiveLocale, {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,

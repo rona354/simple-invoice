@@ -4,6 +4,8 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { logout } from '@/features/auth'
 import { Button } from '@/shared/components/ui'
+import { LanguageSwitcher } from '@/shared/components/language-switcher'
+import { useTranslations } from '@/shared/i18n'
 import { cn } from '@/shared/utils'
 
 interface HeaderProps {
@@ -18,6 +20,7 @@ export function Header({ user, onMenuClick, className }: HeaderProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [showDropdown, setShowDropdown] = useState(false)
+  const t = useTranslations()
 
   function handleLogout() {
     startTransition(async () => {
@@ -47,44 +50,48 @@ export function Header({ user, onMenuClick, className }: HeaderProps) {
 
       <div className="hidden lg:block" />
 
-      <div className="relative">
-        <button
-          type="button"
-          className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-          onClick={() => setShowDropdown(!showDropdown)}
-        >
-          <span className="hidden sm:inline">{user?.email ?? 'Account'}</span>
-          <ChevronDownIcon className="h-4 w-4" />
-        </button>
+      <div className="flex items-center gap-2">
+        <LanguageSwitcher />
 
-        {showDropdown && (
-          <>
-            <div
-              className="fixed inset-0 z-10"
-              onClick={() => setShowDropdown(false)}
-            />
-            <div className="absolute right-0 z-20 mt-1 w-48 rounded-md border border-gray-200 bg-white py-1 shadow-lg">
-              <button
-                type="button"
-                className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-                onClick={() => {
-                  setShowDropdown(false)
-                  router.push('/settings')
-                }}
-              >
-                Settings
-              </button>
-              <button
-                type="button"
-                className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100"
-                onClick={handleLogout}
-                disabled={isPending}
-              >
-                {isPending ? 'Signing out...' : 'Sign out'}
-              </button>
-            </div>
-          </>
-        )}
+        <div className="relative">
+          <button
+            type="button"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            onClick={() => setShowDropdown(!showDropdown)}
+          >
+            <span className="hidden sm:inline">{user?.email ?? t('nav.account')}</span>
+            <ChevronDownIcon className="h-4 w-4" />
+          </button>
+
+          {showDropdown && (
+            <>
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setShowDropdown(false)}
+              />
+              <div className="absolute right-0 z-20 mt-1 w-48 rounded-md border border-gray-200 bg-white py-1 shadow-lg">
+                <button
+                  type="button"
+                  className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                  onClick={() => {
+                    setShowDropdown(false)
+                    router.push('/settings')
+                  }}
+                >
+                  {t('nav.settings')}
+                </button>
+                <button
+                  type="button"
+                  className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100"
+                  onClick={handleLogout}
+                  disabled={isPending}
+                >
+                  {isPending ? t('nav.signingOut') : t('nav.signOut')}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </header>
   )

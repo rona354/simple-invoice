@@ -1,6 +1,8 @@
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import type { InvoiceWithProfile } from '../types'
+import { createTranslator, getLocaleFromString, type Locale } from '@/shared/i18n'
+import { getLanguageLocale, getCurrencyLocale } from '@/shared/utils'
 
 const MARGIN = 20
 const PAGE_WIDTH = 210
@@ -21,15 +23,17 @@ const COLORS = {
 } as const
 
 function formatCurrency(cents: number, currency: string): string {
-  return new Intl.NumberFormat('en-US', {
+  const locale = getCurrencyLocale(currency)
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,
   }).format(cents / 100)
 }
 
-function formatDate(dateString: string): string {
-  return new Intl.DateTimeFormat('en-US', {
+function formatDate(dateString: string, language: Locale): string {
+  const locale = getLanguageLocale(language)
+  return new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -45,9 +49,13 @@ function checkPageOverflow(doc: jsPDF, y: number, requiredSpace: number): number
   return y
 }
 
-export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promise<Buffer> {
+export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile, locale?: Locale): Promise<Buffer> {
   const doc = new jsPDF()
   const { profile } = invoice
+
+  const language = locale || getLocaleFromString(invoice.language)
+  const t = createTranslator(language)
+
   const isPaid = invoice.status === 'paid'
   const isOverdue = invoice.due_date && new Date(invoice.due_date) < new Date() && !isPaid
 
@@ -110,7 +118,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
   doc.setFontSize(24)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
-  doc.text('INVOICE', rightX, rightY, { align: 'right' })
+  doc.text(t('invoice.title'), rightX, rightY, { align: 'right' })
   rightY += 8
 
   doc.setFontSize(12)
@@ -121,23 +129,23 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
 
   doc.setFontSize(9)
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text('Issue Date', rightX - 35, rightY)
+  doc.text(t('invoice.issueDate'), rightX - 35, rightY)
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
   doc.setFont('helvetica', 'bold')
-  doc.text(formatDate(invoice.issue_date), rightX, rightY, { align: 'right' })
+  doc.text(formatDate(invoice.issue_date, language), rightX, rightY, { align: 'right' })
   rightY += 5
 
   if (invoice.due_date) {
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-    doc.text('Due Date', rightX - 35, rightY)
+    doc.text(t('invoice.dueDate'), rightX - 35, rightY)
     if (isOverdue) {
       doc.setTextColor(COLORS.danger.r, COLORS.danger.g, COLORS.danger.b)
     } else {
       doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
     }
     doc.setFont('helvetica', 'bold')
-    doc.text(formatDate(invoice.due_date), rightX, rightY, { align: 'right' })
+    doc.text(formatDate(invoice.due_date, language), rightX, rightY, { align: 'right' })
     rightY += 5
   }
 
@@ -156,7 +164,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
   doc.setFontSize(8)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text('BILL TO', MARGIN, y)
+  doc.text(t('invoice.billTo'), MARGIN, y)
   y += 5
 
   doc.setFontSize(11)
@@ -186,7 +194,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
   if (invoice.client_tax_id) {
     y += 1
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-    doc.text(`Tax ID: ${invoice.client_tax_id}`, MARGIN, y)
+    doc.text(`${t('invoice.clientTaxId')}: ${invoice.client_tax_id}`, MARGIN, y)
     y += 4
   }
 
@@ -203,7 +211,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
   doc.setFontSize(7)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text(isPaid ? 'AMOUNT PAID' : 'AMOUNT DUE', boxX + boxWidth / 2, boxY + 6, { align: 'center' })
+  doc.text(isPaid ? t('invoice.amountPaid') : t('invoice.amountDue'), boxX + boxWidth / 2, boxY + 6, { align: 'center' })
 
   doc.setFontSize(16)
   doc.setFont('helvetica', 'bold')
@@ -218,14 +226,14 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
   doc.setFont('helvetica', 'normal')
   if (isPaid && invoice.paid_date) {
     doc.setTextColor(COLORS.success.r, COLORS.success.g, COLORS.success.b)
-    doc.text(`Paid ${formatDate(invoice.paid_date)}`, boxX + boxWidth / 2, boxY + 22, { align: 'center' })
+    doc.text(`${t('invoice.paid')} ${formatDate(invoice.paid_date, language)}`, boxX + boxWidth / 2, boxY + 22, { align: 'center' })
   } else if (invoice.due_date) {
     if (isOverdue) {
       doc.setTextColor(COLORS.danger.r, COLORS.danger.g, COLORS.danger.b)
-      doc.text('Overdue', boxX + boxWidth / 2, boxY + 22, { align: 'center' })
+      doc.text(t('invoice.overdue'), boxX + boxWidth / 2, boxY + 22, { align: 'center' })
     } else {
       doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-      doc.text(`Due ${formatDate(invoice.due_date)}`, boxX + boxWidth / 2, boxY + 22, { align: 'center' })
+      doc.text(`${t('invoice.due')} ${formatDate(invoice.due_date, language)}`, boxX + boxWidth / 2, boxY + 22, { align: 'center' })
     }
   }
 
@@ -246,8 +254,8 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
 
   autoTable(doc, {
     startY: y,
-    head: [['Description', 'Qty', 'Rate', 'Amount']],
-    body: tableData.length > 0 ? tableData : [['No items', '', '', '']],
+    head: [[t('invoice.description'), t('invoice.quantity'), t('invoice.rate'), t('invoice.amount')]],
+    body: tableData.length > 0 ? tableData : [[t('invoice.noItems'), '', '', '']],
     theme: 'plain',
     headStyles: {
       fillColor: [255, 255, 255],
@@ -290,7 +298,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
 
   doc.setFontSize(9)
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text('Subtotal', totalsX, y)
+  doc.text(t('invoice.subtotal'), totalsX, y)
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
   doc.text(formatCurrency(invoice.subtotal_cents, invoice.currency), valuesX, y, { align: 'right' })
   y += 6
@@ -298,8 +306,8 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
   if (invoice.discount_cents > 0) {
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
     const discountLabel = invoice.discount_type === 'percentage'
-      ? `Discount (${invoice.discount_value}%)`
-      : 'Discount'
+      ? t('invoice.discountPercent', { value: invoice.discount_value })
+      : t('invoice.discount')
     doc.text(discountLabel, totalsX, y)
     doc.setTextColor(COLORS.danger.r, COLORS.danger.g, COLORS.danger.b)
     doc.text(`-${formatCurrency(invoice.discount_cents, invoice.currency)}`, valuesX, y, { align: 'right' })
@@ -308,7 +316,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
 
   if (invoice.tax_cents > 0) {
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-    doc.text(`Tax (${invoice.tax_rate}%)`, totalsX, y)
+    doc.text(t('invoice.taxPercent', { value: invoice.tax_rate }), totalsX, y)
     doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
     doc.text(formatCurrency(invoice.tax_cents, invoice.currency), valuesX, y, { align: 'right' })
     y += 6
@@ -324,7 +332,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
   doc.setFontSize(11)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
-  doc.text('Total', totalsX, y)
+  doc.text(t('invoice.total'), totalsX, y)
   doc.setFontSize(13)
   doc.text(formatCurrency(invoice.total_cents, invoice.currency), valuesX, y, { align: 'right' })
   y += 20
@@ -344,7 +352,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
     doc.setFontSize(7)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(29, 78, 216)
-    doc.text('PAYMENT INSTRUCTIONS', MARGIN + 8, y + 8)
+    doc.text(t('invoice.paymentInstructions'), MARGIN + 8, y + 8)
 
     doc.setFontSize(9)
     doc.setFont('helvetica', 'normal')
@@ -365,7 +373,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
     doc.setFontSize(7)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-    doc.text('NOTES', MARGIN + 8, y + 8)
+    doc.text(t('invoice.notes'), MARGIN + 8, y + 8)
 
     doc.setFontSize(9)
     doc.setFont('helvetica', 'normal')
@@ -382,7 +390,7 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
     doc.setFontSize(7)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-    doc.text('TERMS & CONDITIONS', MARGIN, y)
+    doc.text(t('invoice.termsAndConditions'), MARGIN, y)
     y += 5
 
     doc.setFontSize(8)

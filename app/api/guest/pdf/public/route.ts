@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { renderGuestInvoiceToBuffer } from '@/features/guest/pdf'
+import { getLocaleFromString } from '@/shared/i18n'
 import type { GuestInvoice } from '@/features/guest'
 
 export const runtime = 'nodejs'
@@ -49,7 +51,10 @@ export async function POST(request: NextRequest) {
 
     const { invoice } = parsed.data
 
-    const pdfBuffer = renderGuestInvoiceToBuffer(invoice as GuestInvoice)
+    const cookieStore = await cookies()
+    const locale = getLocaleFromString(cookieStore.get('NEXT_LOCALE')?.value)
+
+    const pdfBuffer = renderGuestInvoiceToBuffer(invoice as GuestInvoice, locale)
     const uint8Array = new Uint8Array(pdfBuffer)
 
     return new NextResponse(uint8Array, {

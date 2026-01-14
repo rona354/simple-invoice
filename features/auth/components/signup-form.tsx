@@ -5,10 +5,12 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Input } from '@/shared/components/ui'
+import { useTranslations } from '@/shared/i18n'
 import { signupSchema, type SignupInput } from '../schema'
 import { signup, signInWithOAuth } from '../actions'
 
 export function SignupForm() {
+  const t = useTranslations()
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [isOAuthLoading, setIsOAuthLoading] = useState(false)
@@ -55,10 +57,10 @@ export function SignupForm() {
     return (
       <div className="text-center">
         <div className="mb-4 rounded-md bg-green-50 p-4 text-sm text-green-700">
-          Check your email for a confirmation link.
+          {t('auth.checkEmail')}
         </div>
         <Link href="/login" className="text-sm text-blue-600 hover:text-blue-700">
-          Back to sign in
+          {t('auth.backToSignIn')}
         </Link>
       </div>
     )
@@ -73,38 +75,38 @@ export function SignupForm() {
       )}
 
       <Input
-        label="Email"
+        label={t('auth.email')}
         type="email"
         autoComplete="email"
-        placeholder="you@example.com"
+        placeholder={t('auth.emailPlaceholder')}
         error={errors.email?.message}
         {...register('email')}
       />
 
       <Input
-        label="Password"
+        label={t('auth.password')}
         type="password"
         autoComplete="new-password"
-        placeholder="Create a password"
+        placeholder={t('auth.createPassword')}
         error={errors.password?.message}
         {...register('password')}
       />
 
       <Input
-        label="Confirm Password"
+        label={t('auth.confirmPassword')}
         type="password"
         autoComplete="new-password"
-        placeholder="Confirm your password"
+        placeholder={t('auth.confirmPasswordPlaceholder')}
         error={errors.confirmPassword?.message}
         {...register('confirmPassword')}
       />
 
       <p className="text-xs text-gray-500">
-        Password must be at least 8 characters with uppercase, lowercase, and a number.
+        {t('auth.passwordHint')}
       </p>
 
       <Button type="submit" className="w-full" loading={isSubmitting}>
-        Create account
+        {t('auth.createAccount')}
       </Button>
 
       <div className="relative">
@@ -112,7 +114,7 @@ export function SignupForm() {
           <div className="w-full border-t border-gray-300" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-white px-2 text-gray-500">Or continue with</span>
+          <span className="bg-white px-2 text-gray-500">{t('auth.orContinueWith')}</span>
         </div>
       </div>
 
@@ -145,9 +147,9 @@ export function SignupForm() {
       </Button>
 
       <p className="text-center text-sm text-gray-600">
-        Already have an account?{' '}
+        {t('auth.hasAccount')}{' '}
         <Link href="/login" className="text-blue-600 hover:text-blue-700">
-          Sign in
+          {t('auth.signIn')}
         </Link>
       </p>
     </form>

@@ -1,6 +1,7 @@
 'use client'
 
-import { formatCurrency } from '@/shared/utils'
+import { formatCurrency, getLanguageLocale } from '@/shared/utils'
+import { useTranslations, useLocale } from '@/shared/i18n'
 
 interface InvoiceTotalsProps {
   subtotalCents: number
@@ -9,7 +10,6 @@ interface InvoiceTotalsProps {
   taxCents: number
   totalCents: number
   currency: string
-  locale?: string
 }
 
 export function InvoiceTotals({
@@ -19,37 +19,40 @@ export function InvoiceTotals({
   taxCents,
   totalCents,
   currency,
-  locale = 'en-US',
 }: InvoiceTotalsProps) {
+  const t = useTranslations()
+  const { locale } = useLocale()
+  const formatLocale = getLanguageLocale(locale)
+
   return (
     <div className="flex justify-end">
       <div className="w-64 space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-500">Subtotal</span>
-          <span>{formatCurrency(subtotalCents, currency, locale)}</span>
+          <span className="text-gray-500">{t('invoice.subtotal')}</span>
+          <span>{formatCurrency(subtotalCents, currency, formatLocale)}</span>
         </div>
 
         {discountCents > 0 && (
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Discount</span>
+            <span className="text-gray-500">{t('invoice.discount')}</span>
             <span className="text-red-600">
-              -{formatCurrency(discountCents, currency, locale)}
+              -{formatCurrency(discountCents, currency, formatLocale)}
             </span>
           </div>
         )}
 
         {taxRate > 0 && (
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Tax ({taxRate}%)</span>
-            <span>{formatCurrency(taxCents, currency, locale)}</span>
+            <span className="text-gray-500">{t('invoice.taxPercent', { value: taxRate })}</span>
+            <span>{formatCurrency(taxCents, currency, formatLocale)}</span>
           </div>
         )}
 
         <div className="border-t border-gray-200 pt-2">
           <div className="flex justify-between font-semibold">
-            <span>Total</span>
+            <span>{t('invoice.total')}</span>
             <span data-testid="total">
-              {formatCurrency(totalCents, currency, locale)}
+              {formatCurrency(totalCents, currency, formatLocale)}
             </span>
           </div>
         </div>

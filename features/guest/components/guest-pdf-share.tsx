@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/shared/components/ui'
+import { useTranslations } from '@/shared/i18n'
 import type { GuestInvoice } from '../types'
 
 interface GuestPdfShareProps {
@@ -19,6 +20,7 @@ export function GuestPdfShare({
   disabled = false,
   size = 'md',
 }: GuestPdfShareProps) {
+  const t = useTranslations()
   const [isSharing, setIsSharing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [canShareFiles, setCanShareFiles] = useState(false)
@@ -60,7 +62,7 @@ export function GuestPdfShare({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || 'Failed to generate PDF')
+        throw new Error(errorData.message || t('guest.failedToGeneratePdf'))
       }
 
       const blob = await response.blob()
@@ -72,7 +74,7 @@ export function GuestPdfShare({
       if (err instanceof Error && err.name === 'AbortError') {
         return
       }
-      const message = err instanceof Error ? err.message : 'Share failed'
+      const message = err instanceof Error ? err.message : t('guest.shareFailed')
       setError(message)
     } finally {
       setIsSharing(false)
@@ -90,7 +92,7 @@ export function GuestPdfShare({
       title={error || undefined}
     >
       {!isSharing && <ShareIcon />}
-      <span className={isSharing ? '' : 'ml-2'}>Share PDF</span>
+      <span className={isSharing ? '' : 'ml-2'}>{t('invoice.sharePdf')}</span>
     </Button>
   )
 }

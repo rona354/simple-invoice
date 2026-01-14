@@ -5,9 +5,11 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { Button, Input, Textarea, Select, Spinner } from '@/shared/components/ui'
+import { LanguageSwitcher } from '@/shared/components/language-switcher'
 import { Logo } from '@/shared/layout'
 import { CURRENCY_OPTIONS } from '@/shared/config'
 import { formatCurrency, calculateInvoiceTotals } from '@/shared/utils'
+import { useTranslations } from '@/shared/i18n'
 import { guestInvoiceFormSchema, type GuestInvoiceFormData } from '../schema'
 import { saveGuestInvoice, getGuestInvoice, markGuestPdfGenerated, hasUsedGuestInvoice } from '../storage'
 import { generateFingerprint, generateInvoiceId } from '../fingerprint'
@@ -41,6 +43,7 @@ function buildGuestInvoice(data: GuestInvoiceFormData, invoiceId: string): Guest
 }
 
 export function GuestInvoiceCreator() {
+  const t = useTranslations()
   const [invoiceId, setInvoiceId] = useState<string>('')
   const [fingerprint, setFingerprint] = useState<string>('')
   const [isDownloading, setIsDownloading] = useState(false)
@@ -228,11 +231,12 @@ export function GuestInvoiceCreator() {
           <Logo size="md" />
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-500">
-              {saveStatus === 'saving' && 'Saving...'}
-              {saveStatus === 'saved' && 'Saved'}
+              {saveStatus === 'saving' && t('guest.saving')}
+              {saveStatus === 'saved' && t('guest.saved')}
             </span>
+            <LanguageSwitcher />
             <Link href="/login">
-              <Button variant="ghost" size="sm">Sign in</Button>
+              <Button variant="ghost" size="sm">{t('auth.signIn')}</Button>
             </Link>
           </div>
         </div>
@@ -240,9 +244,9 @@ export function GuestInvoiceCreator() {
 
       <main className="mx-auto max-w-4xl px-4 py-8">
         <div className="mb-6 rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-700">
-          Free invoice mode — Create 1 invoice without signing up.{' '}
+          {t('guest.freeModeBanner')}{' '}
           <Link href="/signup" className="font-medium underline">
-            Sign up for unlimited invoices
+            {t('guest.signUpCta')}
           </Link>
         </div>
 
@@ -253,53 +257,53 @@ export function GuestInvoiceCreator() {
 
           <div className="grid gap-8 lg:grid-cols-2">
             <section className="space-y-4 rounded-lg border border-gray-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-gray-900">Your Details</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('guest.yourDetails')}</h2>
               <Input
-                label="Business Name *"
-                placeholder="Your business name"
+                label={`${t('guest.businessName')} *`}
+                placeholder={t('guest.fromName')}
                 error={form.formState.errors.from_name?.message}
                 {...form.register('from_name')}
               />
               <Input
-                label="Email"
+                label={t('guest.fromEmail')}
                 type="email"
                 placeholder="your@email.com"
                 error={form.formState.errors.from_email?.message}
                 {...form.register('from_email')}
               />
               <Textarea
-                label="Address"
+                label={t('guest.fromAddress')}
                 rows={2}
-                placeholder="Street, City, Country"
+                placeholder={t('invoice.clientAddress')}
                 {...form.register('from_address')}
               />
             </section>
 
             <section className="space-y-4 rounded-lg border border-gray-200 bg-white p-6">
-              <h2 className="text-lg font-semibold text-gray-900">Bill To</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('guest.to')}</h2>
               <Input
-                label="Client Name *"
-                placeholder="Client name"
+                label={`${t('guest.toName')} *`}
+                placeholder={t('guest.toName')}
                 error={form.formState.errors.to_name?.message}
                 {...form.register('to_name')}
               />
               <Input
-                label="Client Email"
+                label={t('guest.toEmail')}
                 type="email"
                 placeholder="client@email.com"
                 error={form.formState.errors.to_email?.message}
                 {...form.register('to_email')}
               />
               <Input
-                label="Phone"
+                label={t('guest.toPhone')}
                 type="tel"
                 placeholder="+1 234 567 8900"
                 {...form.register('to_phone')}
               />
               <Textarea
-                label="Address"
+                label={t('guest.toAddress')}
                 rows={2}
-                placeholder="Street, City, Country"
+                placeholder={t('invoice.clientAddress')}
                 {...form.register('to_address')}
               />
             </section>
@@ -307,18 +311,18 @@ export function GuestInvoiceCreator() {
 
           <section className="space-y-4 rounded-lg border border-gray-200 bg-white p-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Line Items</h2>
+              <h2 className="text-lg font-semibold text-gray-900">{t('invoice.lineItems')}</h2>
               <Button type="button" variant="outline" size="sm" onClick={addItem}>
-                Add Item
+                {t('invoice.addItem')}
               </Button>
             </div>
 
             <div className="space-y-2">
               <div className="grid grid-cols-12 gap-2 text-sm font-medium text-gray-500">
-                <div className="col-span-5">Description</div>
-                <div className="col-span-2">Qty</div>
-                <div className="col-span-2">Rate</div>
-                <div className="col-span-2 text-right">Amount</div>
+                <div className="col-span-5">{t('invoice.description')}</div>
+                <div className="col-span-2">{t('invoice.quantity')}</div>
+                <div className="col-span-2">{t('invoice.rate')}</div>
+                <div className="col-span-2 text-right">{t('invoice.amount')}</div>
                 <div className="col-span-1" />
               </div>
 
@@ -331,7 +335,7 @@ export function GuestInvoiceCreator() {
                   <div key={field.id} className="grid grid-cols-12 gap-2">
                     <div className="col-span-5">
                       <Input
-                        placeholder="Description"
+                        placeholder={t('invoice.description')}
                         error={form.formState.errors.items?.[index]?.description?.message}
                         {...form.register(`items.${index}.description`)}
                       />
@@ -373,17 +377,17 @@ export function GuestInvoiceCreator() {
             <div className="mt-6 flex justify-end">
               <div className="w-64 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Subtotal</span>
+                  <span className="text-gray-500">{t('invoice.subtotal')}</span>
                   <span>{formatCurrency(totals.subtotalCents, watchedCurrency)}</span>
                 </div>
                 {totals.taxCents > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Tax ({watchedTaxRate}%)</span>
+                    <span className="text-gray-500">{t('invoice.taxPercent', { value: watchedTaxRate })}</span>
                     <span>{formatCurrency(totals.taxCents, watchedCurrency)}</span>
                   </div>
                 )}
                 <div className="flex justify-between border-t pt-2 text-base font-semibold">
-                  <span>Total</span>
+                  <span>{t('invoice.total')}</span>
                   <span>{formatCurrency(totals.totalCents, watchedCurrency)}</span>
                 </div>
               </div>
@@ -391,21 +395,21 @@ export function GuestInvoiceCreator() {
           </section>
 
           <section className="space-y-4 rounded-lg border border-gray-200 bg-white p-6">
-            <h2 className="text-lg font-semibold text-gray-900">Invoice Details</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('invoice.invoiceDetails')}</h2>
             <div className="grid gap-4 sm:grid-cols-3">
               <Input
-                label="Due Date *"
+                label={`${t('invoice.dueDate')} *`}
                 type="date"
                 error={form.formState.errors.due_date?.message}
                 {...form.register('due_date')}
               />
               <Select
-                label="Currency"
+                label={t('invoice.currency')}
                 options={CURRENCY_OPTIONS}
                 {...form.register('currency')}
               />
               <Input
-                label="Tax Rate (%)"
+                label={t('invoice.taxRate')}
                 type="number"
                 step="0.1"
                 min="0"
@@ -414,9 +418,9 @@ export function GuestInvoiceCreator() {
               />
             </div>
             <Textarea
-              label="Notes"
+              label={t('invoice.notesLabel')}
               rows={3}
-              placeholder="Payment instructions, thank you message, etc."
+              placeholder={t('invoice.notesPlaceholder')}
               {...form.register('notes')}
             />
           </section>
@@ -452,10 +456,10 @@ export function GuestInvoiceCreator() {
               {isDownloading ? (
                 <>
                   <Spinner className="mr-2 h-4 w-4" />
-                  Generating PDF...
+                  {t('guest.generatingPdf')}
                 </>
               ) : (
-                'Download Invoice PDF'
+                t('guest.downloadPdf')
               )}
             </Button>
           </div>

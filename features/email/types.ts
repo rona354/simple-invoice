@@ -8,6 +8,7 @@ export interface SendInvoiceEmailParams {
   senderName: string
   senderEmail: string | null
   pdfBuffer?: Buffer
+  language?: string
 }
 
 export interface EmailResult {

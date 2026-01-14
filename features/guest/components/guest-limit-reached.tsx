@@ -2,10 +2,12 @@
 
 import Link from 'next/link'
 import { Button } from '@/shared/components/ui'
+import { useTranslations } from '@/shared/i18n'
 import { Logo } from '@/shared/layout'
 import { getGuestInvoice } from '../storage'
 
 export function GuestLimitReached() {
+  const t = useTranslations()
   const guestState = getGuestInvoice()
   const invoiceNumber = guestState?.invoice?.number ?? 'your invoice'
 
@@ -15,7 +17,7 @@ export function GuestLimitReached() {
         <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4">
           <Logo size="md" />
           <Link href="/login">
-            <Button variant="ghost" size="sm">Sign in</Button>
+            <Button variant="ghost" size="sm">{t('auth.signIn')}</Button>
           </Link>
         </div>
       </header>
@@ -29,10 +31,10 @@ export function GuestLimitReached() {
           </div>
 
           <h1 className="mb-2 text-2xl font-bold text-gray-900">
-            You&apos;ve used your free invoice
+            {t('guest.usedFreeInvoice')}
           </h1>
           <p className="mb-8 text-gray-600">
-            Good news: signing up takes 10 seconds and unlocks:
+            {t('guest.signUpBenefits')}
           </p>
 
           <ul className="mb-8 space-y-3 text-left">
@@ -40,44 +42,44 @@ export function GuestLimitReached() {
               <svg className="mr-3 h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              Unlimited invoices
+              {t('guest.unlimitedInvoices')}
             </li>
             <li className="flex items-center text-gray-700">
               <svg className="mr-3 h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              Save {invoiceNumber} to your account
+              {t('guest.saveToAccount', { invoiceNumber })}
             </li>
             <li className="flex items-center text-gray-700">
               <svg className="mr-3 h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              Track payment status
+              {t('guest.trackPaymentStatus')}
             </li>
             <li className="flex items-center text-gray-700">
               <svg className="mr-3 h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              Send invoices via email
+              {t('guest.sendViaEmail')}
             </li>
             <li className="flex items-center text-gray-700">
               <svg className="mr-3 h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              Client management
+              {t('guest.clientManagement')}
             </li>
           </ul>
 
           <Link href="/signup">
             <Button size="lg" className="w-full">
-              Create Free Account
+              {t('guest.createFreeAccount')}
             </Button>
           </Link>
 
           <p className="mt-4 text-sm text-gray-500">
-            Already have an account?{' '}
+            {t('auth.hasAccount')}{' '}
             <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              Sign in
+              {t('auth.signIn')}
             </Link>
           </p>
         </div>

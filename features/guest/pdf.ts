@@ -2,6 +2,8 @@ import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import type { GuestInvoice } from './types'
 import { calculateInvoiceTotals } from '@/shared/utils'
+import { createTranslator, type Locale } from '@/shared/i18n'
+import { getLanguageLocale, getCurrencyLocale } from '@/shared/utils'
 
 const MARGIN = 20
 const PAGE_WIDTH = 210
@@ -19,23 +21,27 @@ const COLORS = {
 } as const
 
 function formatCurrency(cents: number, currency: string): string {
-  return new Intl.NumberFormat('en-US', {
+  const locale = getCurrencyLocale(currency)
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,
   }).format(cents / 100)
 }
 
-function formatDate(dateString: string): string {
-  return new Intl.DateTimeFormat('en-US', {
+function formatDate(dateString: string, language: Locale): string {
+  const locale = getLanguageLocale(language)
+  return new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   }).format(new Date(dateString))
 }
 
-export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
+export function renderGuestInvoiceToBuffer(invoice: GuestInvoice, locale: Locale = 'en'): Buffer {
   const doc = new jsPDF()
+
+  const t = createTranslator(locale)
 
   const itemsForCalc = invoice.items.map((item) => ({
     description: item.description,
@@ -52,7 +58,7 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
   doc.setFontSize(9)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(153, 27, 27)
-  doc.text('simple-invoice-chi.vercel.app guest mode', PAGE_WIDTH / 2, 9, { align: 'center' })
+  doc.text(t('guest.watermark'), PAGE_WIDTH / 2, 9, { align: 'center' })
 
   y = 14 + MARGIN
 
@@ -92,7 +98,7 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
   doc.setFontSize(24)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
-  doc.text('INVOICE', rightX, rightY, { align: 'right' })
+  doc.text(t('invoice.title'), rightX, rightY, { align: 'right' })
   rightY += 8
 
   doc.setFontSize(12)
@@ -103,18 +109,18 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
 
   doc.setFontSize(9)
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text('Issue Date', rightX - 35, rightY)
+  doc.text(t('invoice.issueDate'), rightX - 35, rightY)
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
   doc.setFont('helvetica', 'bold')
-  doc.text(formatDate(invoice.date), rightX, rightY, { align: 'right' })
+  doc.text(formatDate(invoice.date, locale), rightX, rightY, { align: 'right' })
   rightY += 5
 
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text('Due Date', rightX - 35, rightY)
+  doc.text(t('invoice.dueDate'), rightX - 35, rightY)
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
   doc.setFont('helvetica', 'bold')
-  doc.text(formatDate(invoice.due_date), rightX, rightY, { align: 'right' })
+  doc.text(formatDate(invoice.due_date, locale), rightX, rightY, { align: 'right' })
 
   y = Math.max(y, rightY) + 15
 
@@ -130,7 +136,7 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
   doc.setFontSize(8)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text('BILL TO', MARGIN, y)
+  doc.text(t('invoice.billTo'), MARGIN, y)
   y += 5
 
   doc.setFontSize(11)
@@ -167,7 +173,7 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
   doc.setFontSize(7)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text('AMOUNT DUE', boxX + boxWidth / 2, boxY + 6, { align: 'center' })
+  doc.text(t('invoice.amountDue'), boxX + boxWidth / 2, boxY + 6, { align: 'center' })
 
   doc.setFontSize(16)
   doc.setFont('helvetica', 'bold')
@@ -177,7 +183,7 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
   doc.setFontSize(8)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text(`Due ${formatDate(invoice.due_date)}`, boxX + boxWidth / 2, boxY + 22, { align: 'center' })
+  doc.text(`${t('invoice.due')} ${formatDate(invoice.due_date, locale)}`, boxX + boxWidth / 2, boxY + 22, { align: 'center' })
 
   y = Math.max(y, boxY + boxHeight) + 8
 
@@ -196,8 +202,8 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
 
   autoTable(doc, {
     startY: y,
-    head: [['Description', 'Qty', 'Rate', 'Amount']],
-    body: tableData.length > 0 ? tableData : [['No items', '', '', '']],
+    head: [[t('invoice.description'), t('invoice.quantity'), t('invoice.rate'), t('invoice.amount')]],
+    body: tableData.length > 0 ? tableData : [[t('invoice.noItems'), '', '', '']],
     theme: 'plain',
     styles: {
       cellPadding: { top: 6, bottom: 6, left: 4, right: 4 },
@@ -241,14 +247,14 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
 
   doc.setFontSize(9)
   doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-  doc.text('Subtotal', totalsX, y)
+  doc.text(t('invoice.subtotal'), totalsX, y)
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
   doc.text(formatCurrency(totals.subtotalCents, invoice.currency), valuesX, y, { align: 'right' })
   y += 6
 
   if (totals.taxCents > 0) {
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-    doc.text(`Tax (${invoice.tax_rate}%)`, totalsX, y)
+    doc.text(t('invoice.taxPercent', { value: invoice.tax_rate }), totalsX, y)
     doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
     doc.text(formatCurrency(totals.taxCents, invoice.currency), valuesX, y, { align: 'right' })
     y += 6
@@ -264,7 +270,7 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
   doc.setFontSize(11)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
-  doc.text('Total', totalsX, y)
+  doc.text(t('invoice.total'), totalsX, y)
   doc.setFontSize(13)
   doc.text(formatCurrency(totals.totalCents, invoice.currency), valuesX, y, { align: 'right' })
   y += 20
@@ -280,7 +286,7 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
     doc.setFontSize(7)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
-    doc.text('NOTES', MARGIN + 8, y + 8)
+    doc.text(t('invoice.notes'), MARGIN + 8, y + 8)
 
     doc.setFontSize(9)
     doc.setFont('helvetica', 'normal')

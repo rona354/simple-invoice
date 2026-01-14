@@ -1,19 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import { Card } from '@/shared/components/ui'
-import { StatusBadge } from '@/shared/components/ui'
-import { formatCurrency, formatDate } from '@/shared/utils'
+import { Card, StatusBadge } from '@/shared/components/ui'
+import { formatCurrency, formatDate, getLanguageLocale } from '@/shared/utils'
+import { useTranslations, useLocale } from '@/shared/i18n'
 import { getInvoiceDisplayStatus } from '../utils'
 import type { Invoice } from '../types'
 import type { InvoiceStatus } from '@/shared/types'
 
 interface InvoiceCardProps {
   invoice: Invoice
-  locale?: string
 }
 
-export function InvoiceCard({ invoice, locale = 'en-US' }: InvoiceCardProps) {
+export function InvoiceCard({ invoice }: InvoiceCardProps) {
+  const t = useTranslations()
+  const { locale } = useLocale()
+  const dateLocale = getLanguageLocale(locale)
   const displayStatus = getInvoiceDisplayStatus(
     invoice.status,
     invoice.due_date
@@ -31,12 +33,12 @@ export function InvoiceCard({ invoice, locale = 'en-US' }: InvoiceCardProps) {
         </div>
         <div className="mt-4 flex items-center justify-between">
           <p className="font-semibold">
-            {formatCurrency(invoice.total_cents, invoice.currency, locale)}
+            {formatCurrency(invoice.total_cents, invoice.currency, dateLocale)}
           </p>
           <p className="text-sm text-gray-500">
             {invoice.due_date
-              ? `Due ${formatDate(invoice.due_date, locale)}`
-              : formatDate(invoice.issue_date, locale)}
+              ? `${t('invoice.due')} ${formatDate(invoice.due_date, dateLocale)}`
+              : formatDate(invoice.issue_date, dateLocale)}
           </p>
         </div>
       </Card>

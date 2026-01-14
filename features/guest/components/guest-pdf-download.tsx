@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/shared/components/ui'
+import { useTranslations } from '@/shared/i18n'
 import type { GuestInvoice } from '../types'
 
 interface GuestPdfDownloadProps {
@@ -10,6 +11,7 @@ interface GuestPdfDownloadProps {
 }
 
 export function GuestPdfDownload({ invoice, invoiceId }: GuestPdfDownloadProps) {
+  const t = useTranslations()
   const [isDownloading, setIsDownloading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -25,7 +27,7 @@ export function GuestPdfDownload({ invoice, invoiceId }: GuestPdfDownloadProps) 
       })
 
       if (!response.ok) {
-        throw new Error('Failed to generate PDF')
+        throw new Error(t('guest.failedToGeneratePdf'))
       }
 
       const blob = await response.blob()
@@ -38,7 +40,7 @@ export function GuestPdfDownload({ invoice, invoiceId }: GuestPdfDownloadProps) 
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Download failed')
+      setError(err instanceof Error ? err.message : t('guest.downloadFailed'))
     } finally {
       setIsDownloading(false)
     }
@@ -54,7 +56,7 @@ export function GuestPdfDownload({ invoice, invoiceId }: GuestPdfDownloadProps) 
         size="sm"
       >
         {!isDownloading && <DownloadIcon />}
-        <span className={isDownloading ? '' : 'ml-2'}>Download PDF</span>
+        <span className={isDownloading ? '' : 'ml-2'}>{t('invoice.downloadPdf')}</span>
       </Button>
       {error && (
         <span className="text-xs text-red-600">{error}</span>

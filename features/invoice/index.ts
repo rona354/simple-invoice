@@ -55,6 +55,10 @@ export {
   InvoiceList,
   InvoiceForm,
   InvoiceDisplay,
+  InvoicesPageHeader,
+  InvoiceDetailActions,
+  InvoicePublicLink,
+  InvoiceFormHeader,
   WhatsAppSend,
 } from './components'
 

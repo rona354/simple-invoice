@@ -1,5 +1,8 @@
+'use client'
+
 import type { HTMLAttributes } from 'react'
 import { cn } from '@/shared/utils'
+import { useTranslations } from '@/shared/i18n'
 import type { InvoiceStatus } from '@/shared/types'
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
@@ -27,13 +30,22 @@ function Badge({ className, variant = 'default', ...props }: BadgeProps) {
   )
 }
 
-const statusConfig: Record<InvoiceStatus, { variant: BadgeProps['variant']; label: string }> = {
-  draft: { variant: 'secondary', label: 'Draft' },
-  sent: { variant: 'warning', label: 'Sent' },
-  viewed: { variant: 'default', label: 'Viewed' },
-  paid: { variant: 'success', label: 'Paid' },
-  overdue: { variant: 'error', label: 'Overdue' },
-  cancelled: { variant: 'secondary', label: 'Cancelled' },
+const statusVariants: Record<InvoiceStatus, BadgeProps['variant']> = {
+  draft: 'secondary',
+  sent: 'warning',
+  viewed: 'default',
+  paid: 'success',
+  overdue: 'error',
+  cancelled: 'secondary',
+}
+
+const statusKeys: Record<InvoiceStatus, string> = {
+  draft: 'invoice.statusDraft',
+  sent: 'invoice.statusSent',
+  viewed: 'invoice.statusViewed',
+  paid: 'invoice.statusPaid',
+  overdue: 'invoice.statusOverdue',
+  cancelled: 'invoice.statusCancelled',
 }
 
 interface StatusBadgeProps extends Omit<BadgeProps, 'variant'> {
@@ -41,11 +53,11 @@ interface StatusBadgeProps extends Omit<BadgeProps, 'variant'> {
 }
 
 function StatusBadge({ status, className, ...props }: StatusBadgeProps) {
-  const config = statusConfig[status]
+  const t = useTranslations()
 
   return (
-    <Badge variant={config.variant} className={className} {...props}>
-      {config.label}
+    <Badge variant={statusVariants[status]} className={className} {...props}>
+      {t(statusKeys[status])}
     </Badge>
   )
 }

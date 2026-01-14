@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { getCurrentUser, assertOwnership } from '@/shared/lib/auth'
 import { invoiceService } from '@/features/invoice/service'
@@ -6,6 +7,7 @@ import { invoiceIdSchema } from '@/features/invoice/schema'
 import { renderInvoiceToBuffer } from '@/features/invoice/pdf/invoice-pdf'
 import { generateInvoiceFilename } from '@/shared/lib/pdf'
 import { AppError } from '@/shared/errors'
+import { getLocaleFromString } from '@/shared/i18n'
 
 export async function GET(
   _request: NextRequest,
@@ -20,7 +22,10 @@ export async function GET(
 
     assertOwnership(invoice, user.id, 'invoice')
 
-    const buffer = await renderInvoiceToBuffer(invoice)
+    const cookieStore = await cookies()
+    const locale = getLocaleFromString(cookieStore.get('NEXT_LOCALE')?.value)
+
+    const buffer = await renderInvoiceToBuffer(invoice, locale)
     const filename = generateInvoiceFilename(invoice.invoice_number)
 
     return new NextResponse(new Uint8Array(buffer), {

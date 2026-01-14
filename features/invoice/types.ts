@@ -36,6 +36,7 @@ export interface Invoice extends Timestamps {
   total_cents: number
 
   currency: string
+  language: string
 
   issue_date: string
   due_date: string | null
@@ -75,6 +76,7 @@ export interface InvoiceInsert {
   tax_cents?: number
   total_cents: number
   currency?: string
+  language?: string
   issue_date?: string
   due_date?: string | null
   notes?: string | null
@@ -100,6 +102,7 @@ export interface InvoiceUpdate {
   tax_cents?: number
   total_cents?: number
   currency?: string
+  language?: string
   issue_date?: string
   due_date?: string | null
   paid_date?: string | null

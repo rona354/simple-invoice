@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Input } from '@/shared/components/ui'
+import { useTranslations } from '@/shared/i18n'
 import { loginSchema, type LoginInput } from '../schema'
 import { login, signInWithOAuth } from '../actions'
 
@@ -15,6 +16,7 @@ interface LoginFormProps {
 
 export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
   const router = useRouter()
+  const t = useTranslations()
   const [error, setError] = useState<string | null>(null)
   const [isOAuthLoading, setIsOAuthLoading] = useState(false)
 
@@ -66,19 +68,19 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
       )}
 
       <Input
-        label="Email"
+        label={t('auth.email')}
         type="email"
         autoComplete="email"
-        placeholder="you@example.com"
+        placeholder={t('auth.emailPlaceholder')}
         error={errors.email?.message}
         {...register('email')}
       />
 
       <Input
-        label="Password"
+        label={t('auth.password')}
         type="password"
         autoComplete="current-password"
-        placeholder="Enter your password"
+        placeholder={t('auth.passwordPlaceholder')}
         error={errors.password?.message}
         {...register('password')}
       />
@@ -88,12 +90,12 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
           href="/forgot-password"
           className="text-sm text-blue-600 hover:text-blue-700"
         >
-          Forgot password?
+          {t('auth.forgotPassword')}
         </Link>
       </div>
 
       <Button type="submit" className="w-full" loading={isSubmitting}>
-        Sign in
+        {t('auth.signIn')}
       </Button>
 
       <div className="relative">
@@ -101,7 +103,7 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
           <div className="w-full border-t border-gray-300" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-white px-2 text-gray-500">Or continue with</span>
+          <span className="bg-white px-2 text-gray-500">{t('auth.orContinueWith')}</span>
         </div>
       </div>
 
@@ -134,9 +136,9 @@ export function LoginForm({ redirectTo = '/dashboard' }: LoginFormProps) {
       </Button>
 
       <p className="text-center text-sm text-gray-600">
-        Don&apos;t have an account?{' '}
+        {t('auth.noAccount')}{' '}
         <Link href="/signup" className="text-blue-600 hover:text-blue-700">
-          Sign up
+          {t('auth.signUp')}
         </Link>
       </p>
     </form>

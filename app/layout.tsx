@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { LocaleProvider } from '@/shared/i18n'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -58,14 +59,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <LocaleProvider>{children}</LocaleProvider>
+      </body>
     </html>
   )
 }

@@ -10,6 +10,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
+import { createTranslator, getLocaleFromString } from '@/shared/i18n'
 
 interface InvoiceEmailTemplateProps {
   invoiceNumber: string
@@ -18,6 +19,7 @@ interface InvoiceEmailTemplateProps {
   dueDate: string | null
   publicUrl: string
   senderName: string
+  language?: string
 }
 
 export function InvoiceEmailTemplate({
@@ -27,8 +29,12 @@ export function InvoiceEmailTemplate({
   dueDate,
   publicUrl,
   senderName,
+  language = 'en',
 }: InvoiceEmailTemplateProps) {
-  const previewText = `Invoice ${invoiceNumber} for ${amount}`
+  const locale = getLocaleFromString(language)
+  const t = createTranslator(locale)
+
+  const previewText = t('email.preview', { invoiceNumber, amount })
 
   return (
     <Html>
@@ -36,30 +42,32 @@ export function InvoiceEmailTemplate({
       <Preview>{previewText}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={heading}>Invoice {invoiceNumber}</Heading>
+          <Heading style={heading}>
+            {t('invoice.title')} {invoiceNumber}
+          </Heading>
 
-          <Text style={paragraph}>Hi {clientName},</Text>
+          <Text style={paragraph}>{t('email.greeting', { clientName })}</Text>
 
           <Text style={paragraph}>
-            {senderName} has sent you an invoice for <strong>{amount}</strong>.
+            {t('email.body', { senderName, amount })}
           </Text>
 
           {dueDate && (
             <Text style={paragraph}>
-              <strong>Due Date:</strong> {dueDate}
+              <strong>{t('email.dueDateLabel')}</strong> {dueDate}
             </Text>
           )}
 
           <Section style={buttonContainer}>
             <Button style={button} href={publicUrl}>
-              View Invoice
+              {t('email.viewInvoice')}
             </Button>
           </Section>
 
           <Hr style={hr} />
 
           <Text style={footer}>
-            This invoice was sent by {senderName} using Simple Invoice.
+            {t('email.footer', { senderName })}
           </Text>
         </Container>
       </Body>

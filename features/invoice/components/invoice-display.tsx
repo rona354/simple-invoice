@@ -1,8 +1,10 @@
 'use client'
 
+import { useMemo } from 'react'
 import Image from 'next/image'
 import type { InvoiceWithProfile } from '../types'
-import { formatCurrency, formatDate } from '@/shared/utils'
+import { formatCurrency, formatDate, getLanguageLocale } from '@/shared/utils'
+import { useTranslations, useLocale } from '@/shared/i18n'
 
 interface InvoiceDisplayProps {
   invoice: InvoiceWithProfile
@@ -15,6 +17,10 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
   const { profile } = invoice
   const isPaid = invoice.status === 'paid'
   const isOverdue = invoice.due_date && new Date(invoice.due_date) < new Date() && !isPaid
+
+  const { locale } = useLocale()
+  const t = useTranslations()
+  const dateLocale = useMemo(() => getLanguageLocale(locale), [locale])
 
   return (
     <div className="invoice-display bg-white">
@@ -60,20 +66,20 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
 
           {/* Right: Invoice Title & Meta */}
           <div className="text-right">
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">INVOICE</h1>
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{t('invoice.title')}</h1>
             <p className="text-lg font-medium text-gray-700 mt-1">{invoice.invoice_number}</p>
             <div className="mt-4 space-y-1 text-sm">
               <div className="flex justify-end gap-4">
-                <span className="text-gray-500">Issue Date</span>
+                <span className="text-gray-500">{t('invoice.issueDate')}</span>
                 <span className="font-medium text-gray-900 w-28 text-left">
-                  {formatDate(invoice.issue_date)}
+                  {formatDate(invoice.issue_date, dateLocale)}
                 </span>
               </div>
               {invoice.due_date && (
                 <div className="flex justify-end gap-4">
-                  <span className="text-gray-500">Due Date</span>
+                  <span className="text-gray-500">{t('invoice.dueDate')}</span>
                   <span className={`font-medium w-28 text-left ${isOverdue ? 'text-red-600' : 'text-gray-900'}`}>
-                    {formatDate(invoice.due_date)}
+                    {formatDate(invoice.due_date, dateLocale)}
                   </span>
                 </div>
               )}
@@ -89,7 +95,7 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
           {/* Bill To */}
           <div>
             <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
-              Bill To
+              {t('invoice.billTo')}
             </h2>
             <div className="text-sm space-y-0.5">
               <p className="text-base font-semibold text-gray-900">{invoice.client_name}</p>
@@ -99,7 +105,7 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
               {invoice.client_email && <p className="text-gray-600 mt-2">{invoice.client_email}</p>}
               {invoice.client_phone && <p className="text-gray-600">{invoice.client_phone}</p>}
               {invoice.client_tax_id && (
-                <p className="text-gray-500 mt-2">Tax ID: {invoice.client_tax_id}</p>
+                <p className="text-gray-500 mt-2">{t('invoice.clientTaxId')}: {invoice.client_tax_id}</p>
               )}
             </div>
           </div>
@@ -108,19 +114,19 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
           <div className="text-right">
             <div className="inline-block bg-gray-50 border border-gray-200 rounded-lg px-6 py-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
-                {isPaid ? 'Amount Paid' : 'Amount Due'}
+                {isPaid ? t('invoice.amountPaid') : t('invoice.amountDue')}
               </p>
               <p className={`text-3xl font-bold ${isPaid ? 'text-green-600' : 'text-gray-900'}`}>
-                {formatCurrency(invoice.total_cents, invoice.currency)}
+                {formatCurrency(invoice.total_cents, invoice.currency, dateLocale)}
               </p>
               {invoice.due_date && !isPaid && (
                 <p className={`text-sm mt-1 ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
-                  {isOverdue ? 'Overdue' : `Due ${formatDate(invoice.due_date)}`}
+                  {isOverdue ? t('invoice.overdue') : `${t('invoice.due')} ${formatDate(invoice.due_date, dateLocale)}`}
                 </p>
               )}
               {isPaid && invoice.paid_date && (
                 <p className="text-sm text-green-600 mt-1">
-                  Paid {formatDate(invoice.paid_date)}
+                  {t('invoice.paid')} {formatDate(invoice.paid_date, dateLocale)}
                 </p>
               )}
             </div>
@@ -133,16 +139,16 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
             <thead>
               <tr className="border-b-2 border-gray-200">
                 <th className="py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  Description
+                  {t('invoice.description')}
                 </th>
                 <th className="py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 w-20">
-                  Qty
+                  {t('invoice.quantity')}
                 </th>
                 <th className="py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 w-28">
-                  Rate
+                  {t('invoice.rate')}
                 </th>
                 <th className="py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 w-28">
-                  Amount
+                  {t('invoice.amount')}
                 </th>
               </tr>
             </thead>
@@ -157,10 +163,10 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
                   </td>
                   <td className="py-4 text-sm text-center text-gray-600">{item.quantity}</td>
                   <td className="py-4 text-sm text-right text-gray-600">
-                    {formatCurrency(item.unit_price_cents, invoice.currency)}
+                    {formatCurrency(item.unit_price_cents, invoice.currency, dateLocale)}
                   </td>
                   <td className="py-4 text-sm text-right font-medium text-gray-900">
-                    {formatCurrency(item.amount_cents, invoice.currency)}
+                    {formatCurrency(item.amount_cents, invoice.currency, dateLocale)}
                   </td>
                 </tr>
               ))}
@@ -173,36 +179,36 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
           <div className="w-72">
             <div className="space-y-2 text-sm">
               <div className="flex justify-between py-1">
-                <span className="text-gray-500">Subtotal</span>
+                <span className="text-gray-500">{t('invoice.subtotal')}</span>
                 <span className="text-gray-900">
-                  {formatCurrency(invoice.subtotal_cents, invoice.currency)}
+                  {formatCurrency(invoice.subtotal_cents, invoice.currency, dateLocale)}
                 </span>
               </div>
               {invoice.discount_cents > 0 && (
                 <div className="flex justify-between py-1">
                   <span className="text-gray-500">
-                    Discount
+                    {t('invoice.discount')}
                     {invoice.discount_type === 'percentage' && ` (${invoice.discount_value}%)`}
                   </span>
                   <span className="text-red-600">
-                    -{formatCurrency(invoice.discount_cents, invoice.currency)}
+                    -{formatCurrency(invoice.discount_cents, invoice.currency, dateLocale)}
                   </span>
                 </div>
               )}
               {invoice.tax_rate > 0 && (
                 <div className="flex justify-between py-1">
-                  <span className="text-gray-500">Tax ({invoice.tax_rate}%)</span>
+                  <span className="text-gray-500">{t('invoice.taxPercent', { value: invoice.tax_rate })}</span>
                   <span className="text-gray-900">
-                    {formatCurrency(invoice.tax_cents, invoice.currency)}
+                    {formatCurrency(invoice.tax_cents, invoice.currency, dateLocale)}
                   </span>
                 </div>
               )}
             </div>
             <div className="border-t-2 border-gray-900 mt-3 pt-3">
               <div className="flex justify-between">
-                <span className="text-base font-semibold text-gray-900">Total</span>
+                <span className="text-base font-semibold text-gray-900">{t('invoice.total')}</span>
                 <span className="text-xl font-bold text-gray-900">
-                  {formatCurrency(invoice.total_cents, invoice.currency)}
+                  {formatCurrency(invoice.total_cents, invoice.currency, dateLocale)}
                 </span>
               </div>
             </div>
@@ -215,7 +221,7 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
             {invoice.payment_instructions && (
               <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-blue-700 mb-2">
-                  Payment Instructions
+                  {t('invoice.paymentInstructionsLabel')}
                 </h3>
                 <p className="text-sm text-blue-900 whitespace-pre-wrap">
                   {invoice.payment_instructions}
@@ -225,7 +231,7 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
             {invoice.notes && (
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
-                  Notes
+                  {t('invoice.notesLabel')}
                 </h3>
                 <p className="text-sm text-gray-700 whitespace-pre-wrap">{invoice.notes}</p>
               </div>
@@ -233,7 +239,7 @@ export function InvoiceDisplay({ invoice, showStatus, statusBadge, actions }: In
             {invoice.terms && (
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
-                  Terms & Conditions
+                  {t('invoice.termsAndConditions')}
                 </h3>
                 <p className="text-xs text-gray-500 whitespace-pre-wrap">{invoice.terms}</p>
               </div>

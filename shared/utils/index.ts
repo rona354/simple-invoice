@@ -5,6 +5,8 @@ export {
   formatPercent,
   centsToDollars,
   dollarsToCents,
+  getCurrencyLocale,
+  getLanguageLocale,
 } from './format'
 
 export {

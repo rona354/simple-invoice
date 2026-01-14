@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/shared/utils'
+import { useTranslations } from '@/shared/i18n'
 import { generateGuestWhatsAppUrl } from '../whatsapp'
 import type { GuestInvoice } from '../types'
 
@@ -22,6 +23,7 @@ export function GuestWhatsAppSend({
   size = 'md',
   className,
 }: GuestWhatsAppSendProps) {
+  const t = useTranslations()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -45,7 +47,7 @@ export function GuestWhatsAppSend({
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create shareable link')
+        throw new Error(t('guest.failedToCreateLink'))
       }
 
       const { publicUrl } = await response.json()
@@ -53,7 +55,7 @@ export function GuestWhatsAppSend({
 
       window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to share')
+      setError(err instanceof Error ? err.message : t('guest.shareFailed'))
     } finally {
       setIsLoading(false)
     }
@@ -73,12 +75,12 @@ export function GuestWhatsAppSend({
         sizes[size],
         className
       )}
-      aria-label={`Send invoice ${invoice.number} via WhatsApp`}
+      aria-label={t('guest.sendViaWhatsApp', { invoiceNumber: invoice.number })}
       aria-busy={isLoading}
       title={error || undefined}
     >
       {isLoading ? <Spinner /> : <WhatsAppIcon />}
-      <span>{isLoading ? 'Creating link...' : 'WhatsApp'}</span>
+      <span>{isLoading ? t('guest.creatingLink') : 'WhatsApp'}</span>
     </button>
   )
 }

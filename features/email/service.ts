@@ -1,5 +1,6 @@
 import { resend, getFromEmail } from '@/shared/lib/resend'
 import { InvoiceEmailTemplate } from './templates/invoice-email'
+import { createTranslator, getLocaleFromString } from '@/shared/i18n'
 import type { SendInvoiceEmailParams, EmailResult } from './types'
 
 class EmailService {
@@ -15,13 +16,20 @@ class EmailService {
           ]
         : undefined
 
+      const locale = getLocaleFromString(params.language)
+      const t = createTranslator(locale)
+      const subject = t('email.subject', {
+        invoiceNumber: params.invoiceNumber,
+        senderName: params.senderName || 'Simple Invoice',
+      })
+
       const { data, error } = await resend.emails.send({
         from: params.senderName
           ? `${params.senderName} <${fromEmail}>`
           : fromEmail,
         to: params.to,
         replyTo: params.senderEmail || undefined,
-        subject: `Invoice ${params.invoiceNumber} from ${params.senderName || 'Simple Invoice'}`,
+        subject,
         react: InvoiceEmailTemplate({
           invoiceNumber: params.invoiceNumber,
           clientName: params.clientName,
@@ -29,6 +37,7 @@ class EmailService {
           dueDate: params.dueDate,
           publicUrl: params.publicUrl,
           senderName: params.senderName,
+          language: params.language,
         }),
         attachments,
       })

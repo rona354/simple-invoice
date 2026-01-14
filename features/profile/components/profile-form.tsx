@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Input, Select, Textarea } from '@/shared/components/ui'
 import { CURRENCY_OPTIONS, LOCALE_OPTIONS, DATE_FORMAT_OPTIONS } from '@/shared/config'
+import { useTranslations } from '@/shared/i18n'
 import { profileFormSchema, type ProfileFormInput } from '../schema'
 import { updateProfile } from '../actions'
 import type { Profile } from '../types'
@@ -14,6 +15,7 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ profile }: ProfileFormProps) {
+  const t = useTranslations()
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
@@ -68,56 +70,56 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
       {success && (
         <div className="rounded-md bg-green-50 p-3 text-sm text-green-600">
-          Profile saved successfully
+          {t('settings.profileSaved')}
         </div>
       )}
 
       <section>
-        <h3 className="mb-4 text-lg font-medium text-gray-900">Business Information</h3>
+        <h3 className="mb-4 text-lg font-medium text-gray-900">{t('settings.businessInfo')}</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
-            label="Business Name"
-            placeholder="Your Business Name"
+            label={t('settings.businessName')}
+            placeholder={t('settings.businessNamePlaceholder')}
             error={errors.business_name?.message}
             {...register('business_name')}
           />
           <Input
-            label="Business Email"
+            label={t('settings.businessEmail')}
             type="email"
-            placeholder="business@example.com"
+            placeholder={t('settings.businessEmailPlaceholder')}
             error={errors.business_email?.message}
             {...register('business_email')}
           />
           <Input
-            label="Phone"
+            label={t('settings.businessPhone')}
             type="tel"
-            placeholder="+1 (555) 123-4567"
+            placeholder={t('settings.businessPhonePlaceholder')}
             error={errors.business_phone?.message}
             {...register('business_phone')}
           />
           <div className="sm:col-span-2">
             <Input
-              label="Address"
-              placeholder="123 Business Street"
+              label={t('settings.businessAddress')}
+              placeholder={t('settings.businessAddressPlaceholder')}
               error={errors.business_address?.message}
               {...register('business_address')}
             />
           </div>
           <Input
-            label="City"
-            placeholder="New York"
+            label={t('settings.businessCity')}
+            placeholder={t('settings.businessCityPlaceholder')}
             error={errors.business_city?.message}
             {...register('business_city')}
           />
           <Input
-            label="Country"
-            placeholder="United States"
+            label={t('settings.businessCountry')}
+            placeholder={t('settings.businessCountryPlaceholder')}
             error={errors.business_country?.message}
             {...register('business_country')}
           />
           <Input
-            label="Postal Code"
-            placeholder="10001"
+            label={t('settings.businessPostalCode')}
+            placeholder={t('settings.businessPostalCodePlaceholder')}
             error={errors.business_postal_code?.message}
             {...register('business_postal_code')}
           />
@@ -125,17 +127,17 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </section>
 
       <section>
-        <h3 className="mb-4 text-lg font-medium text-gray-900">Tax Information</h3>
+        <h3 className="mb-4 text-lg font-medium text-gray-900">{t('settings.taxInfo')}</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
-            label="Tax ID Label"
-            placeholder="Tax ID, VAT, GST, etc."
+            label={t('settings.taxIdLabel')}
+            placeholder={t('settings.taxIdLabelPlaceholder')}
             error={errors.tax_id_label?.message}
             {...register('tax_id_label')}
           />
           <Input
-            label="Tax ID"
-            placeholder="Your tax identification number"
+            label={t('settings.taxId')}
+            placeholder={t('settings.taxIdPlaceholder')}
             error={errors.tax_id?.message}
             {...register('tax_id')}
           />
@@ -143,16 +145,16 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </section>
 
       <section>
-        <h3 className="mb-4 text-lg font-medium text-gray-900">Invoice Defaults</h3>
+        <h3 className="mb-4 text-lg font-medium text-gray-900">{t('settings.invoiceDefaults')}</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <Select
-            label="Default Currency"
+            label={t('settings.defaultCurrency')}
             options={CURRENCY_OPTIONS}
             error={errors.default_currency?.message}
             {...register('default_currency')}
           />
           <Input
-            label="Payment Terms (days)"
+            label={t('settings.defaultPaymentTerms')}
             type="number"
             min={0}
             max={365}
@@ -160,7 +162,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             {...register('default_payment_terms')}
           />
           <Input
-            label="Default Tax Rate (%)"
+            label={t('settings.defaultTaxRate')}
             type="number"
             min={0}
             max={100}
@@ -172,14 +174,14 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <Textarea
-            label="Default Notes"
-            placeholder="Notes that appear on all invoices"
+            label={t('settings.defaultNotes')}
+            placeholder={t('settings.defaultNotesPlaceholder')}
             error={errors.default_notes?.message}
             {...register('default_notes')}
           />
           <Textarea
-            label="Default Payment Instructions"
-            placeholder="Payment instructions for clients"
+            label={t('settings.defaultPaymentInstructions')}
+            placeholder={t('settings.defaultPaymentInstructionsPlaceholder')}
             error={errors.default_payment_instructions?.message}
             {...register('default_payment_instructions')}
           />
@@ -187,16 +189,16 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </section>
 
       <section>
-        <h3 className="mb-4 text-lg font-medium text-gray-900">Localization</h3>
+        <h3 className="mb-4 text-lg font-medium text-gray-900">{t('settings.localization')}</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <Select
-            label="Locale"
+            label={t('settings.locale')}
             options={LOCALE_OPTIONS}
             error={errors.locale?.message}
             {...register('locale')}
           />
           <Select
-            label="Date Format"
+            label={t('settings.dateFormat')}
             options={DATE_FORMAT_OPTIONS}
             error={errors.date_format?.message}
             {...register('date_format')}
@@ -206,7 +208,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
       <div className="flex justify-end">
         <Button type="submit" loading={isSubmitting}>
-          Save Changes
+          {t('settings.saveChanges')}
         </Button>
       </div>
     </form>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/shared/components/ui'
+import { useTranslations } from '@/shared/i18n'
 
 interface PdfShareProps {
   invoiceId?: string
@@ -16,6 +17,7 @@ export function PdfShare({
   invoiceNumber = 'invoice',
   size = 'md',
 }: PdfShareProps) {
+  const t = useTranslations()
   const [isSharing, setIsSharing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [canShareFiles, setCanShareFiles] = useState(false)
@@ -42,7 +44,7 @@ export function PdfShare({
 
   async function handleShare() {
     if (!publicId && !invoiceId) {
-      setError('Missing invoice ID')
+      setError(t('common.error'))
       return
     }
 
@@ -63,7 +65,7 @@ export function PdfShare({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Failed to generate PDF')
+        throw new Error(errorData.error || t('common.failed'))
       }
 
       const blob = await response.blob()
@@ -75,7 +77,7 @@ export function PdfShare({
       if (err instanceof Error && err.name === 'AbortError') {
         return
       }
-      const message = err instanceof Error ? err.message : 'Share failed'
+      const message = err instanceof Error ? err.message : t('common.failed')
       setError(message)
     } finally {
       setIsSharing(false)
@@ -93,7 +95,7 @@ export function PdfShare({
         aria-busy={isSharing}
       >
         {!isSharing && <ShareIcon />}
-        <span className={isSharing ? '' : 'ml-2'}>Share PDF</span>
+        <span className={isSharing ? '' : 'ml-2'}>{t('invoice.sharePdf')}</span>
       </Button>
       {error && (
         <span className="text-xs text-red-600" role="alert">

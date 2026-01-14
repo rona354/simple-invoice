@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getInvoice, InvoiceForm } from '@/features/invoice'
+import { getInvoice, InvoiceForm, InvoiceFormHeader } from '@/features/invoice'
 import { getProfile } from '@/features/profile'
 
 interface PageProps {
@@ -35,14 +35,7 @@ export default async function EditInvoicePage({ params }: PageProps) {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Edit Invoice {invoice.invoice_number}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Update the invoice details
-        </p>
-      </div>
+      <InvoiceFormHeader mode="edit" invoiceNumber={invoice.invoice_number} />
 
       <div className="rounded-lg border border-gray-200 bg-white p-6">
         <InvoiceForm profile={profile} invoice={invoice} />

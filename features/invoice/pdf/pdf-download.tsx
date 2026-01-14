@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/shared/components/ui'
+import { useTranslations } from '@/shared/i18n'
 
 interface PdfDownloadProps {
   invoiceId?: string
@@ -16,12 +17,13 @@ export function PdfDownload({
   variant = 'default',
   size = 'md',
 }: PdfDownloadProps) {
+  const t = useTranslations()
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function handleDownload() {
     if (!publicId && !invoiceId) {
-      setError('Missing invoice ID')
+      setError(t('common.error'))
       return
     }
 
@@ -36,7 +38,7 @@ export function PdfDownload({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Failed to generate PDF')
+        throw new Error(errorData.error || t('common.failed'))
       }
 
       const blob = await response.blob()
@@ -52,7 +54,7 @@ export function PdfDownload({
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Download failed'
+      const message = err instanceof Error ? err.message : t('common.failed')
       setError(message)
     } finally {
       setIsGenerating(false)
@@ -60,10 +62,10 @@ export function PdfDownload({
   }
 
   const buttonText = isGenerating
-    ? 'Generating...'
+    ? t('common.generating')
     : error
-      ? 'Retry Download'
-      : 'Download PDF'
+      ? t('common.retry')
+      : t('invoice.downloadPdf')
 
   return (
     <div className="inline-flex flex-col items-start gap-1">

@@ -11,8 +11,8 @@ Resume Simple Invoice development.
 
 Workspace: /Users/royan.fauzan/Developer/rona354/simple-invoice/
 
-Current phase: Post-Launch (v1.4) - Complete
-Next task: Deploy changes to production
+Current phase: Post-Launch (v1.6) - i18n SSOT Refactor
+Next task: Deploy to production
 
 GitHub: https://github.com/rona354/simple-invoice
 Live: https://simple-invoice-chi.vercel.app
@@ -29,8 +29,8 @@ Architecture: Pragmatic Clean Architecture
 
 | Item | Value |
 |------|-------|
-| **Phase** | Post-Launch (v1.4) |
-| **Progress** | Security Hardening |
+| **Phase** | Post-Launch (v1.6) |
+| **Progress** | i18n SSOT Refactor Complete |
 | **Tests** | 150 passing |
 | **Build** | Passing |
 | **Blockers** | None |
@@ -54,6 +54,8 @@ Architecture: Pragmatic Clean Architecture
 | 11 | Share PDF (Web Share API) | Done |
 | 12 | Guest Mode: Share PDF & WhatsApp | Done |
 | 13 | Security Hardening (v1.4) | Done |
+| 14 | i18n - Indonesian/English (v1.5) | Done |
+| 15 | i18n SSOT Refactor (v1.6) | Done |
 
 ---
 
@@ -72,6 +74,127 @@ Architecture: Pragmatic Clean Architecture
 - [x] AlternativeTo (submitted, pending approval)
 - [ ] Product Hunt (optional)
 - [ ] SaaSHub (optional)
+
+---
+
+## Session 2026-01-14: i18n SSOT Refactor (v1.6)
+
+**Issue:** Per-invoice language dropdown was redundant and confusing. Two language settings (UI toggle + form dropdown) violated Single Source of Truth principle.
+
+**Solution:** Remove per-invoice language, use UI language for everything.
+
+**Changes:**
+
+1. **Removed "Bahasa Faktur" dropdown from forms:**
+   - `features/invoice/components/invoice-form.tsx`
+   - `features/guest/components/guest-invoice-creator.tsx`
+
+2. **PDF now uses UI language (cookie):**
+   - `app/api/invoices/[id]/pdf/route.ts` - reads `NEXT_LOCALE` cookie
+   - `app/api/public/invoices/[publicId]/pdf/route.ts` - reads `NEXT_LOCALE` cookie
+   - `app/api/guest/pdf/route.ts` - reads `NEXT_LOCALE` cookie
+   - `app/api/guest/pdf/public/route.ts` - reads `NEXT_LOCALE` cookie
+
+3. **Invoice display uses UI language:**
+   - `features/invoice/components/invoice-display.tsx` - uses `useLocale()`
+   - `features/guest/components/guest-invoice-display.tsx` - uses `useLocale()`
+
+4. **Removed language field from schemas/types:**
+   - `features/invoice/schema.ts`
+   - `features/invoice/types.ts`
+   - `features/invoice/hooks.ts`
+   - `features/invoice/service.ts`
+   - `features/guest/schema.ts`
+   - `features/guest/types.ts`
+
+5. **Fixed hardcoded copy in components:**
+   - `signup-form.tsx` - now uses `useTranslations()`
+   - `conversion-modal.tsx` - now uses `useTranslations()`
+   - `guest-limit-reached.tsx` - now uses `useTranslations()`
+   - `guest-whatsapp-send.tsx` - now uses `useTranslations()`
+   - `guest-pdf-share.tsx` - now uses `useTranslations()`
+   - `guest-pdf-download.tsx` - now uses `useTranslations()`
+
+6. **Added new translation keys:**
+   - `guest.creatingLink`, `guest.failedToCreateLink`, `guest.shareFailed`
+   - `guest.downloadFailed`, `guest.failedToGeneratePdf`, `guest.sendViaWhatsApp`
+
+**How it works now:**
+- User switches language via header toggle (🇬🇧/🇮🇩)
+- UI, invoice display, AND PDF all follow that setting
+- Single source of truth - no confusion
+
+**Database:** Column `invoices.language` still exists but is no longer used. Can be removed in future migration if desired.
+
+---
+
+## Session 2026-01-14: i18n Implementation (v1.5)
+
+**Feature:** Dual-language support (Indonesian + English) for webapp and PDF invoices.
+
+**Architecture Decisions:**
+- Single UI toggle + per-invoice language override in form
+- Date format follows invoice language (id-ID vs en-US)
+- Currency format follows currency (IDR uses Indonesian format, USD uses English)
+- Email language follows invoice language (recipient-focused)
+- Default language: English
+
+**Files Created:**
+```
+messages/en.json                    # English translations
+messages/id.json                    # Indonesian translations
+shared/i18n/config.ts               # Locale configuration
+shared/i18n/translations.ts         # Translation utilities
+shared/i18n/context.tsx             # LocaleProvider + hooks
+shared/i18n/index.ts                # i18n exports
+shared/components/language-switcher.tsx  # Language dropdown
+supabase/migrations/20260115_invoice_language.sql  # DB migration
+```
+
+**Files Modified:**
+```
+app/layout.tsx                      # Add LocaleProvider
+shared/layout/header.tsx            # Add LanguageSwitcher, use translations
+shared/layout/sidebar.tsx           # Use translations for nav
+shared/layout/mobile-nav.tsx        # Use translations for nav
+shared/layout/navigation.ts         # Change name -> nameKey
+shared/utils/format.ts              # Add getCurrencyLocale, getLanguageLocale
+shared/utils/index.ts               # Export new formatting functions
+features/invoice/types.ts           # Add language field
+features/invoice/schema.ts          # Add language validation
+features/invoice/hooks.ts           # Add language to defaults
+features/invoice/pdf/invoice-pdf.ts # i18n for PDF labels
+features/invoice/components/invoice-form.tsx  # Add PDF Language selector
+features/guest/types.ts             # Add language field
+features/guest/schema.ts            # Add language validation
+features/guest/pdf.ts               # i18n for guest PDF labels
+features/guest/components/guest-invoice-creator.tsx  # Add PDF Language selector
+features/email/types.ts             # Add language param
+features/email/service.ts           # Use translated subject
+features/email/templates/invoice-email.tsx  # i18n for email body
+```
+
+**Database Migration:**
+```sql
+ALTER TABLE invoices ADD COLUMN language TEXT NOT NULL DEFAULT 'en';
+ALTER TABLE invoices ADD CONSTRAINT invoices_language_check CHECK (language IN ('en', 'id'));
+```
+
+**UI Changes:**
+- Language switcher (flag + code) in header top-right
+- PDF Language selector in invoice forms (Invoice Details section)
+- Navigation labels now translated
+
+**PDF Labels Translated:**
+- INVOICE / FAKTUR
+- Issue Date / Tanggal Terbit
+- Due Date / Tanggal Jatuh Tempo
+- BILL TO / TAGIHAN UNTUK
+- AMOUNT DUE / JUMLAH TAGIHAN
+- Subtotal, Tax, Total / Subtotal, Pajak, Total
+- NOTES / CATATAN
+- PAYMENT INSTRUCTIONS / INSTRUKSI PEMBAYARAN
+- Description, Qty, Rate, Amount (table headers)
 
 ---
 
