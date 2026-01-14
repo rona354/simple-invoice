@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/shared/utils'
 import { navigation } from './navigation'
+import { Logo } from './logo'
 
 interface SidebarProps {
   className?: string
@@ -19,9 +20,9 @@ export function Sidebar({ className }: SidebarProps) {
         className
       )}
     >
-      <div className="flex h-16 items-center border-b border-gray-200 px-6">
-        <Link href="/dashboard" className="text-xl font-bold text-gray-900">
-          Simple Invoice
+      <div className="flex h-16 items-center border-b border-gray-200 px-4">
+        <Link href="/dashboard">
+          <Logo size="md" />
         </Link>
       </div>
 

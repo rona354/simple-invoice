@@ -5,6 +5,7 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { Button, Input, Textarea, Select, Spinner } from '@/shared/components/ui'
+import { Logo } from '@/shared/layout'
 import { CURRENCY_OPTIONS } from '@/shared/config'
 import { formatCurrency, calculateInvoiceTotals } from '@/shared/utils'
 import { guestInvoiceFormSchema, type GuestInvoiceFormData } from '../schema'
@@ -213,7 +214,7 @@ export function GuestInvoiceCreator() {
     <div className="min-h-screen bg-gray-50">
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4">
-          <span className="text-xl font-bold text-gray-900">Simple Invoice</span>
+          <Logo size="md" />
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-500">
               {saveStatus === 'saving' && 'Saving...'}

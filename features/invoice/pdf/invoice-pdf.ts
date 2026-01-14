@@ -391,12 +391,24 @@ export async function renderInvoiceToBuffer(invoice: InvoiceWithProfile): Promis
   }
 
   // Footer
+  const pageHeight = doc.internal.pageSize.getHeight()
   if (invoice.footer) {
-    const pageHeight = doc.internal.pageSize.getHeight()
     doc.setFontSize(8)
     doc.setTextColor(COLORS.muted.r, COLORS.muted.g, COLORS.muted.b)
     doc.text(invoice.footer, PAGE_WIDTH / 2, pageHeight - 12, { align: 'center' })
   }
+
+  // Branding footer
+  const brandY = pageHeight - 8
+  const brandX = PAGE_WIDTH - MARGIN
+  doc.setFillColor(COLORS.text.r, COLORS.text.g, COLORS.text.b)
+  doc.roundedRect(brandX - 28, brandY - 5, 28, 7, 1, 1, 'F')
+  doc.setFontSize(5)
+  doc.setTextColor(255, 255, 255)
+  doc.setFont('helvetica', 'bold')
+  doc.text('SI', brandX - 25, brandY, { align: 'left' })
+  doc.setFontSize(5)
+  doc.text('Simple Invoice', brandX - 20, brandY, { align: 'left' })
 
   const arrayBuffer = doc.output('arraybuffer')
   return Buffer.from(arrayBuffer)

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Button } from '@/shared/components/ui'
+import { Logo } from '@/shared/layout'
 import { getGuestInvoice } from '../storage'
 
 export function GuestLimitReached() {
@@ -12,7 +13,7 @@ export function GuestLimitReached() {
     <div className="flex min-h-screen flex-col bg-gray-50">
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4">
-          <span className="text-xl font-bold text-gray-900">Simple Invoice</span>
+          <Logo size="md" />
           <Link href="/login">
             <Button variant="ghost" size="sm">Sign in</Button>
           </Link>

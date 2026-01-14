@@ -11,8 +11,8 @@ Resume Simple Invoice development.
 
 Workspace: /Users/royan.fauzan/Developer/rona354/simple-invoice/
 
-Current phase: Guest Mode (v1.1) - Complete
-Next task: Commit and deploy
+Current phase: SEO & Branding (v1.2) - Complete
+Next task: Deploy and submit to directories
 
 GitHub: https://github.com/rona354/simple-invoice
 Live: https://simple-invoice-chi.vercel.app
@@ -29,7 +29,7 @@ Architecture: Pragmatic Clean Architecture
 
 | Item | Value |
 |------|-------|
-| **Phase** | Guest Mode (v1.1) |
+| **Phase** | SEO & Branding (v1.2) |
 | **Progress** | 100% |
 | **Tests** | 150 passing |
 | **Build** | ✅ Passing |
@@ -48,32 +48,50 @@ Architecture: Pragmatic Clean Architecture
 | 5 | Client Feature | ✅ |
 | 6 | App Pages & Polish | ✅ |
 | 7 | Guest Mode (v1.1) | ✅ |
+| 8 | SEO & Branding (v1.2) | ✅ |
 
 ---
 
-## Guest Mode (v1.1) Summary
+## SEO & Branding (v1.2) Summary
 
-**Implemented:**
-- Guest invoice creator at root URL
-- PDF generation with watermark ("simple-invoice-chi.vercel.app guest mode")
-- Rate limiting: 1 per fingerprint, 3 per IP per 24h
-- Conversion modal post-download
-- Limit reached screen with signup CTA
-- localStorage persistence for draft
+**SEO Implementation:**
+- robots.ts — crawler rules (disallow /api, /dashboard, /invoices, /settings)
+- sitemap.ts — public pages sitemap
+- manifest.ts — PWA manifest
+- opengraph-image.tsx — dynamic OG image (1200x630)
+- Full metadata in layout.tsx (OpenGraph, Twitter cards, JSON-LD schema)
+- URL rewrite: /free-invoice-generator → /
+- Canonical URLs and metadataBase configured
+
+**Branding:**
+- favicon.svg — "SI" logo icon (dark bg, white text)
+- Logo component — reusable across app
+- Applied to: Sidebar, MobileNav, Guest pages
+- PDF branding footer on regular invoices
 
 **Files:**
 ```
-features/guest/
-├── types.ts, schema.ts, storage.ts, fingerprint.ts, pdf.ts
-├── components/
-│   ├── guest-invoice-creator.tsx
-│   ├── guest-limit-reached.tsx
-│   └── conversion-modal.tsx
-└── index.ts
+public/
+└── favicon.svg
 
-app/api/guest/pdf/route.ts
-supabase/migrations/20260114_guest_attempts.sql
+app/
+├── robots.ts
+├── sitemap.ts
+├── manifest.ts
+├── opengraph-image.tsx
+└── layout.tsx (updated)
+
+shared/layout/
+├── logo.tsx (new)
+└── index.ts (updated)
+
+next.config.js (updated)
 ```
+
+**Next Steps (Post-Deploy):**
+1. Submit sitemap to Google Search Console
+2. Submit to directories: Product Hunt, G2, Capterra, AlternativeTo
+3. Test social sharing previews
 
 ---
 

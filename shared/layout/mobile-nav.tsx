@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/shared/utils'
 import { navigation } from './navigation'
 import { XIcon } from './icons'
+import { Logo } from './logo'
 
 interface MobileNavProps {
   open: boolean
@@ -25,7 +26,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
 
       <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
         <div className="flex h-16 items-center justify-between border-b border-gray-200 px-4">
-          <span className="text-xl font-bold text-gray-900">Simple Invoice</span>
+          <Logo size="sm" />
           <button
             type="button"
             className="rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500"

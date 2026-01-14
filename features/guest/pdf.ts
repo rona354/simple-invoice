@@ -46,12 +46,12 @@ export function renderGuestInvoiceToBuffer(invoice: GuestInvoice): Buffer {
 
   let y = 0
 
-  // Guest mode watermark bar (light red background, dark red text)
-  doc.setFillColor(254, 226, 226) // light red bg (like red-100)
+  // Guest mode watermark bar
+  doc.setFillColor(254, 226, 226)
   doc.rect(0, 0, PAGE_WIDTH, 14, 'F')
   doc.setFontSize(9)
   doc.setFont('helvetica', 'bold')
-  doc.setTextColor(153, 27, 27) // dark red text (like red-800)
+  doc.setTextColor(153, 27, 27)
   doc.text('simple-invoice-chi.vercel.app guest mode', PAGE_WIDTH / 2, 9, { align: 'center' })
 
   y = 14 + MARGIN
