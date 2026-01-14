@@ -65,7 +65,7 @@ Architecture: Pragmatic Clean Architecture
 - [x] OG Image renders correctly
 
 **Directory Submissions:**
-- [ ] AlternativeTo (in progress)
+- [x] AlternativeTo (submitted, pending approval)
 - [ ] Product Hunt (optional)
 - [ ] SaaSHub (optional)
 
