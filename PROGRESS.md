@@ -11,8 +11,8 @@ Resume Simple Invoice development.
 
 Workspace: /Users/royan.fauzan/Developer/rona354/simple-invoice/
 
-Current phase: SEO & Branding (v1.2) - Complete
-Next task: Deploy and submit to directories
+Current phase: Post-Launch (v1.2) - SEO & Marketing
+Next task: Complete directory submissions, then new features
 
 GitHub: https://github.com/rona354/simple-invoice
 Live: https://simple-invoice-chi.vercel.app
@@ -29,10 +29,10 @@ Architecture: Pragmatic Clean Architecture
 
 | Item | Value |
 |------|-------|
-| **Phase** | SEO & Branding (v1.2) |
-| **Progress** | 100% |
+| **Phase** | Post-Launch (v1.2) |
+| **Progress** | SEO Complete, Marketing In Progress |
 | **Tests** | 150 passing |
-| **Build** | ✅ Passing |
+| **Build** | Passing |
 | **Blockers** | None |
 
 ---
@@ -41,57 +41,55 @@ Architecture: Pragmatic Clean Architecture
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| 1 | Foundation Structure | ✅ |
-| 2 | Invoice Feature Core | ✅ |
-| 3 | Auth & Profile Features | ✅ |
-| 4 | PDF & Email Features | ✅ |
-| 5 | Client Feature | ✅ |
-| 6 | App Pages & Polish | ✅ |
-| 7 | Guest Mode (v1.1) | ✅ |
-| 8 | SEO & Branding (v1.2) | ✅ |
+| 1 | Foundation Structure | Done |
+| 2 | Invoice Feature Core | Done |
+| 3 | Auth & Profile Features | Done |
+| 4 | PDF & Email Features | Done |
+| 5 | Client Feature | Done |
+| 6 | App Pages & Polish | Done |
+| 7 | Guest Mode (v1.1) | Done |
+| 8 | SEO & Branding (v1.2) | Done |
+| 9 | Google Search Console | Done |
 
 ---
 
-## SEO & Branding (v1.2) Summary
+## Post-Launch Checklist
 
-**SEO Implementation:**
-- robots.ts — crawler rules (disallow /api, /dashboard, /invoices, /settings)
-- sitemap.ts — public pages sitemap
-- manifest.ts — PWA manifest
-- opengraph-image.tsx — dynamic OG image (1200x630)
-- Full metadata in layout.tsx (OpenGraph, Twitter cards, JSON-LD schema)
-- URL rewrite: /free-invoice-generator → /
-- Canonical URLs and metadataBase configured
+**Google Search Console:**
+- [x] Verify ownership (HTML file method)
+- [x] Submit sitemap (3 pages indexed)
+- [x] OG Image accessible
 
-**Branding:**
-- favicon.svg — "SI" logo icon (dark bg, white text)
-- Logo component — reusable across app
-- Applied to: Sidebar, MobileNav, Guest pages
-- PDF branding footer on regular invoices
+**Social Preview:**
+- [x] Test on opengraph.xyz
+- [x] OG Image renders correctly
 
-**Files:**
+**Directory Submissions:**
+- [ ] AlternativeTo (in progress)
+- [ ] Product Hunt (optional)
+- [ ] SaaSHub (optional)
+
+---
+
+## Session 2026-01-14: Middleware & SEO Fixes
+
+**Issues Fixed:**
+1. Static files (.html, .xml, .txt, .webmanifest) blocked by middleware → redirect to /login
+2. OG image route blocked by middleware
+
+**Changes:**
 ```
-public/
-└── favicon.svg
+proxy.ts
+- Added extensions to matcher exclusion: html, xml, txt, webmanifest
 
-app/
-├── robots.ts
-├── sitemap.ts
-├── manifest.ts
-├── opengraph-image.tsx
-└── layout.tsx (updated)
-
-shared/layout/
-├── logo.tsx (new)
-└── index.ts (updated)
-
-next.config.js (updated)
+shared/lib/supabase/middleware.ts
+- Added /opengraph-image to public routes
 ```
 
-**Next Steps (Post-Deploy):**
-1. Submit sitemap to Google Search Console
-2. Submit to directories: Product Hunt, G2, Capterra, AlternativeTo
-3. Test social sharing previews
+**Commits:**
+- `fix: exclude .html files from middleware matcher`
+- `fix: exclude xml, txt, webmanifest from middleware`
+- `fix: allow public access to opengraph-image route`
 
 ---
 
@@ -110,3 +108,4 @@ npm run build        # Build for production
 - **GitHub:** https://github.com/rona354/simple-invoice
 - **Live:** https://simple-invoice-chi.vercel.app
 - **Supabase:** https://supabase.com/dashboard/project/hvifoflzxmpbkhbdclir
+- **Google Search Console:** https://search.google.com/search-console?resource_id=https://simple-invoice-chi.vercel.app/
