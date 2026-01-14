@@ -2,8 +2,11 @@
 
 A lightweight invoice generator for freelancers and small businesses. Create professional invoices, send them via email, and track payment status.
 
+**Live Demo:** [simple-invoice-chi.vercel.app](https://simple-invoice-chi.vercel.app)
+
 ## Features
 
+- **Guest Mode** - Create one invoice without signing up
 - Create and manage invoices with line items
 - Professional PDF generation
 - Send invoices via email with one click
@@ -17,7 +20,7 @@ A lightweight invoice generator for freelancers and small businesses. Create pro
 
 - **Frontend:** Next.js 16, React, TypeScript, Tailwind CSS
 - **Backend:** Supabase (PostgreSQL, Auth, Storage)
-- **PDF:** @react-pdf/renderer
+- **PDF:** jsPDF
 - **Email:** Resend
 - **Hosting:** Vercel
 
@@ -69,6 +72,7 @@ simple-invoice/
 │   ├── auth/               # Authentication
 │   ├── client/             # Client management
 │   ├── email/              # Email sending
+│   ├── guest/              # Guest mode (no signup)
 │   ├── invoice/            # Invoice CRUD & PDF
 │   └── profile/            # User profile
 └── shared/                 # Shared code
@@ -115,7 +119,7 @@ npm run lint
 ### Supabase Setup
 
 1. Create a new project at [supabase.com](https://supabase.com)
-2. Run the database migrations (see `PROGRESS.md` Session 9 for SQL)
+2. Run the database migrations from `supabase/migrations/`
 3. Create a `logos` storage bucket with public access
 4. Configure Google OAuth in Authentication > Providers
 
