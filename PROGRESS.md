@@ -19,11 +19,12 @@ Key files:
 - PROGRESS.md → This file (current status)
 - PLAN.md → Original feature plan (historical)
 
-Current phase: Production Ready
-Last completed: Session 14 - Invoice UI/UX redesign (Modern Minimal)
-Next task: Test in browser, deploy to Vercel
+Current phase: Deployed
+Last completed: Session 15 - Vercel deployment
+Next task: User testing, feedback iteration
 
 GitHub: https://github.com/rona354/simple-invoice
+Live: https://simple-invoice-chi.vercel.app
 
 Architecture: Pragmatic Clean Architecture
 - features/{domain}/ → components, actions, service, repository, schema, types
@@ -37,12 +38,13 @@ Architecture: Pragmatic Clean Architecture
 
 | Item | Value |
 |------|-------|
-| **Current Phase** | Production Ready |
+| **Current Phase** | Deployed |
 | **Phase Progress** | 100% |
-| **Overall Progress** | 100% (Build ✅, Tests ✅, Git ✅, Vercel ready) |
+| **Overall Progress** | 100% (Build ✅, Tests ✅, Deployed ✅) |
 | **Last Updated** | 2026-01-14 |
 | **Tests** | 150 passing |
 | **GitHub** | https://github.com/rona354/simple-invoice |
+| **Vercel** | https://simple-invoice-chi.vercel.app |
 | **Blockers** | None |
 
 ---
@@ -1021,6 +1023,55 @@ app/i/[publicId]/page.tsx                        ✅ Use InvoiceDisplay
 - Tests passing: 150/150 ✅
 - Web and PDF now have consistent "Modern Minimal" design
 - Logo support ready (uses `profile.logo_url`)
+
+---
+
+### Session 15 — 2026-01-14
+
+**Time:** Session complete
+
+**What was done:**
+1. **Vercel Deployment**
+   - Deep research on Vercel platform (pricing, config, best practices)
+   - Created `vercel.json` with Singapore region (sin1) for low latency
+   - Configured PDF routes with 1024MB memory, 30s timeout
+   - Deployed to https://simple-invoice-chi.vercel.app
+
+2. **OAuth Fix**
+   - Fixed Google OAuth redirect issue (stuck at homepage with `?code=`)
+   - Root cause: Missing `NEXT_PUBLIC_APP_URL` environment variable
+   - Solution: Added env var in Vercel dashboard, redeployed
+
+3. **Tested in Production**
+   - Google OAuth login ✅
+   - Invoice creation ✅
+   - PDF download ✅
+   - Public invoice view ✅
+
+**Files created:**
+```
+vercel.json  ✅ Deployment configuration
+```
+
+**Environment variables configured in Vercel:**
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+NEXT_PUBLIC_APP_URL
+```
+
+**What's next:**
+- Add Resend API key for email functionality
+- Add Upstash credentials for rate limiting
+- User testing and feedback iteration
+
+**Blockers:** None
+
+**Notes:**
+- App live at https://simple-invoice-chi.vercel.app
+- Region: Singapore (sin1) for Indonesia latency
+- Hobby tier (free) - upgrade to Pro for commercial use
 
 ---
 
