@@ -11,7 +11,7 @@ Resume Simple Invoice development.
 
 Workspace: /Users/royan.fauzan/Developer/rona354/simple-invoice/
 
-Current phase: Post-Launch (v1.6) - i18n SSOT Refactor
+Current phase: Post-Launch (v1.7) - UX Improvements
 Next task: Deploy to production
 
 GitHub: https://github.com/rona354/simple-invoice
@@ -29,8 +29,8 @@ Architecture: Pragmatic Clean Architecture
 
 | Item | Value |
 |------|-------|
-| **Phase** | Post-Launch (v1.6) |
-| **Progress** | i18n SSOT Refactor Complete |
+| **Phase** | Post-Launch (v1.7) |
+| **Progress** | UX Improvements Complete |
 | **Tests** | 150 passing |
 | **Build** | Passing |
 | **Blockers** | None |
@@ -56,6 +56,7 @@ Architecture: Pragmatic Clean Architecture
 | 13 | Security Hardening (v1.4) | Done |
 | 14 | i18n - Indonesian/English (v1.5) | Done |
 | 15 | i18n SSOT Refactor (v1.6) | Done |
+| 16 | UX Improvements (v1.7) | Done |
 
 ---
 
@@ -74,6 +75,45 @@ Architecture: Pragmatic Clean Architecture
 - [x] AlternativeTo (submitted, pending approval)
 - [ ] Product Hunt (optional)
 - [ ] SaaSHub (optional)
+
+---
+
+## Session 2026-01-15: UX Improvements (v1.7)
+
+**Trigger:** UX review of guest invoice form screenshot identified several issues.
+
+**Changes:**
+
+1. **Delete button visibility:**
+   - Icon: X → Trash icon
+   - Color: `text-gray-400` → `text-gray-500` (darker)
+   - Hover: `hover:text-red-500` → `hover:text-red-600` (stronger)
+
+2. **Description placeholder:**
+   - EN: "Description" → "e.g., Logo design service"
+   - ID: "Deskripsi" → "Contoh: Jasa desain logo"
+
+3. **Button layout (guest mode):**
+   - WhatsApp elevated to full-width primary CTA (`size="lg"`)
+   - Share PDF + Download as secondary row (`size="md"`, responsive)
+   - Download demoted to `variant="outline"`
+   - Mobile: all buttons stack vertically
+   - Desktop: Share + Download side-by-side
+
+4. **Translation namespace fix:**
+   - Added `invoice.removeItem` for signed-in form
+   - `line-item-row.tsx` now uses correct namespace
+
+**Files Modified:**
+```
+features/guest/components/guest-invoice-creator.tsx
+features/guest/components/guest-pdf-share.tsx
+features/invoice/components/line-item-row.tsx
+messages/en.json
+messages/id.json
+```
+
+**Commit:** `8975c14 ui: improve UX for delete button, placeholder, and button layout`
 
 ---
 
