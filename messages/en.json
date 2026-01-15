@@ -92,10 +92,12 @@
     "lineItems": "Line Items",
     "addItem": "Add Item",
     "description": "Description",
+    "descriptionPlaceholder": "e.g., Logo design service",
     "quantity": "Qty",
     "rate": "Rate",
     "amount": "Amount",
     "noItems": "No items",
+    "removeItem": "Remove item",
 
     "invoiceDetails": "Invoice Details",
     "currency": "Currency",

@@ -92,10 +92,12 @@
     "lineItems": "Item",
     "addItem": "Tambah Item",
     "description": "Deskripsi",
+    "descriptionPlaceholder": "Contoh: Jasa desain logo",
     "quantity": "Qty",
     "rate": "Harga",
     "amount": "Jumlah",
     "noItems": "Tidak ada item",
+    "removeItem": "Hapus item",
 
     "invoiceDetails": "Detail Faktur",
     "currency": "Mata Uang",

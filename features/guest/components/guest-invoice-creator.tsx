@@ -335,7 +335,7 @@ export function GuestInvoiceCreator() {
                   <div key={field.id} className="grid grid-cols-12 gap-2">
                     <div className="col-span-5">
                       <Input
-                        placeholder={t('invoice.description')}
+                        placeholder={t('invoice.descriptionPlaceholder')}
                         error={form.formState.errors.items?.[index]?.description?.message}
                         {...form.register(`items.${index}.description`)}
                       />
@@ -364,11 +364,11 @@ export function GuestInvoiceCreator() {
                         type="button"
                         onClick={() => fields.length > 1 && remove(index)}
                         disabled={fields.length === 1}
-                        className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-red-500 disabled:opacity-30 transition-colors"
-                        aria-label="Remove item"
+                        className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-red-600 disabled:opacity-30 transition-colors"
+                        aria-label={t('guest.removeItem')}
                       >
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </button>
                     </div>
@@ -428,17 +428,18 @@ export function GuestInvoiceCreator() {
             />
           </section>
 
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex flex-wrap justify-center gap-3">
-              {liveInvoice && fingerprint && invoiceId && (
-                <GuestWhatsAppSend
-                  invoice={liveInvoice}
-                  fingerprint={fingerprint}
-                  invoiceId={invoiceId}
-                  disabled={!form.formState.isValid}
-                  size="md"
-                />
-              )}
+          <div className="flex flex-col gap-3 w-full max-w-md mx-auto">
+            {liveInvoice && fingerprint && invoiceId && (
+              <GuestWhatsAppSend
+                invoice={liveInvoice}
+                fingerprint={fingerprint}
+                invoiceId={invoiceId}
+                disabled={!form.formState.isValid}
+                size="lg"
+                className="w-full"
+              />
+            )}
+            <div className="flex flex-col sm:flex-row gap-3">
               {liveInvoice && fingerprint && invoiceId && (
                 <GuestPdfShare
                   invoice={liveInvoice}
@@ -446,25 +447,27 @@ export function GuestInvoiceCreator() {
                   invoiceId={invoiceId}
                   disabled={!form.formState.isValid}
                   size="md"
+                  className="w-full sm:flex-1"
                 />
               )}
+              <Button
+                type="button"
+                size="md"
+                variant="outline"
+                onClick={handleDownload}
+                disabled={isDownloading}
+                className="w-full sm:flex-1"
+              >
+                {isDownloading ? (
+                  <>
+                    <Spinner className="mr-2 h-4 w-4" />
+                    {t('guest.generatingPdf')}
+                  </>
+                ) : (
+                  t('guest.downloadPdf')
+                )}
+              </Button>
             </div>
-            <Button
-              type="button"
-              size="lg"
-              onClick={handleDownload}
-              disabled={isDownloading}
-              className="w-full max-w-md"
-            >
-              {isDownloading ? (
-                <>
-                  <Spinner className="mr-2 h-4 w-4" />
-                  {t('guest.generatingPdf')}
-                </>
-              ) : (
-                t('guest.downloadPdf')
-              )}
-            </Button>
           </div>
         </form>
       </main>

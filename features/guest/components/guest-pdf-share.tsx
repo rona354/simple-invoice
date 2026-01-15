@@ -11,6 +11,7 @@ interface GuestPdfShareProps {
   invoiceId: string
   disabled?: boolean
   size?: 'sm' | 'md' | 'lg'
+  className?: string
 }
 
 export function GuestPdfShare({
@@ -19,6 +20,7 @@ export function GuestPdfShare({
   invoiceId,
   disabled = false,
   size = 'md',
+  className,
 }: GuestPdfShareProps) {
   const t = useTranslations()
   const [isSharing, setIsSharing] = useState(false)
@@ -88,6 +90,7 @@ export function GuestPdfShare({
       loading={isSharing}
       variant="outline"
       size={size}
+      className={className}
       aria-busy={isSharing}
       title={error || undefined}
     >

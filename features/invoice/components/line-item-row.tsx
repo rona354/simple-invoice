@@ -3,6 +3,7 @@
 import type { UseFormRegister } from 'react-hook-form'
 import { Input } from '@/shared/components/ui'
 import { formatCurrency } from '@/shared/utils'
+import { useTranslations } from '@/shared/i18n'
 import type { InvoiceFormData } from '../schema'
 
 interface LineItemRowProps {
@@ -24,11 +25,13 @@ export function LineItemRow({
   locale = 'en-US',
   amount,
 }: LineItemRowProps) {
+  const t = useTranslations()
+
   return (
     <div className="grid grid-cols-12 gap-2 items-start">
       <div className="col-span-5">
         <Input
-          placeholder="Description"
+          placeholder={t('invoice.descriptionPlaceholder')}
           {...register(`items.${index}.description`)}
         />
       </div>
@@ -58,8 +61,8 @@ export function LineItemRow({
           <button
             type="button"
             onClick={onRemove}
-            className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
-            aria-label="Remove item"
+            className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors"
+            aria-label={t('invoice.removeItem')}
           >
             <svg
               className="h-5 w-5"
@@ -71,7 +74,7 @@ export function LineItemRow({
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
               />
             </svg>
           </button>
